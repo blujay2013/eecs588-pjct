@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite failures="0" time="15.872" errors="0" skipped="0" tests="53" name="com.google.bitcoin.core.WalletTest">
+  <properties>
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
+    <property name="sun.boot.library.path" value="/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Libraries"/>
+    <property name="java.vm.version" value="20.65-b04-462"/>
+    <property name="awt.nativeDoubleBuffering" value="true"/>
+    <property name="gopherProxySet" value="false"/>
+    <property name="mrj.build" value="11M4609"/>
+    <property name="java.vm.vendor" value="Apple Inc."/>
+    <property name="java.vendor.url" value="http://www.apple.com/"/>
+    <property name="path.separator" value=":"/>
+    <property name="guice.disable.misplaced.annotation.check" value="true"/>
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM"/>
+    <property name="file.encoding.pkg" value="sun.io"/>
+    <property name="user.country" value="US"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="sun.os.patch.level" value="unknown"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="user.dir" value="/Users/evarobert/Documents/EECS588/bitcoin/eecs588-pjct/app/bitcoinj"/>
+    <property name="java.runtime.version" value="1.6.0_65-b14-462-11M4609"/>
+    <property name="java.awt.graphicsenv" value="apple.awt.CGraphicsEnvironment"/>
+    <property name="java.endorsed.dirs" value="/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home/lib/endorsed"/>
+    <property name="os.arch" value="x86_64"/>
+    <property name="java.io.tmpdir" value="/var/folders/pv/7r5026wj6bnfnp_4xb06zkyr0000gn/T/"/>
+    <property name="line.separator" value="
+"/>
+    <property name="java.vm.specification.vendor" value="Sun Microsystems Inc."/>
+    <property name="os.name" value="Mac OS X"/>
+    <property name="classworlds.conf" value="/usr/local/apache-maven/apache-maven-3.2.1/bin/m2.conf"/>
+    <property name="sun.jnu.encoding" value="MacRoman"/>
+    <property name="java.library.path" value=".:/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.class.version" value="50.0"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="os.version" value="10.8.5"/>
+    <property name="http.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="user.home" value="/Users/evarobert"/>
+    <property name="user.timezone" value="America/New_York"/>
+    <property name="java.awt.printerjob" value="apple.awt.CPrinterJob"/>
+    <property name="java.specification.version" value="1.6"/>
+    <property name="file.encoding" value="MacRoman"/>
+    <property name="user.name" value="evarobert"/>
+    <property name="java.class.path" value="/usr/local/apache-maven/apache-maven-3.2.1/boot/plexus-classworlds-2.5.1.jar"/>
+    <property name="org.slf4j.simpleLogger.defaultLogLevel" value="info"/>
+    <property name="java.vm.specification.version" value="1.0"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.home" value="/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home"/>
+    <property name="sun.java.command" value="org.codehaus.plexus.classworlds.launcher.Launcher clean package"/>
+    <property name="java.specification.vendor" value="Sun Microsystems Inc."/>
+    <property name="user.language" value="en"/>
+    <property name="awt.toolkit" value="apple.awt.CToolkit"/>
+    <property name="java.vm.info" value="mixed mode"/>
+    <property name="java.version" value="1.6.0_65"/>
+    <property name="java.ext.dirs" value="/Library/Java/Extensions:/System/Library/Java/Extensions:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home/lib/ext"/>
+    <property name="sun.boot.class.path" value="/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/jsfd.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/classes.jar:/System/Library/Frameworks/JavaVM.framework/Frameworks/JavaRuntimeSupport.framework/Resources/Java/JavaRuntimeSupport.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/ui.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/laf.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/sunrsasign.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/jsse.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/jce.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/charsets.jar"/>
+    <property name="java.vendor" value="Apple Inc."/>
+    <property name="maven.home" value="/usr/local/apache-maven/apache-maven-3.2.1"/>
+    <property name="file.separator" value="/"/>
+    <property name="java.vendor.url.bug" value="http://bugreport.apple.com/"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="mrj.version" value="1070.1.6.0_65-462"/>
+    <property name="socksNonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="sun.cpu.isalist" value=""/>
+  </properties>
+  <testcase time="0.157" classname="com.google.bitcoin.core.WalletTest" name="cleanupFailsDueToSpend"/>
+  <testcase time="0.136" classname="com.google.bitcoin.core.WalletTest" name="spendOutputFromPendingTransaction"/>
+  <testcase time="0.11" classname="com.google.bitcoin.core.WalletTest" name="isConsistent_pools"/>
+  <testcase time="0.105" classname="com.google.bitcoin.core.WalletTest" name="isConsistent_spent"/>
+  <testcase time="0.127" classname="com.google.bitcoin.core.WalletTest" name="balances"/>
+  <testcase time="0.12" classname="com.google.bitcoin.core.WalletTest" name="sideChain"/>
+  <testcase time="0.125" classname="com.google.bitcoin.core.WalletTest" name="watchingScriptsConfirmed"/>
+  <testcase time="0.168" classname="com.google.bitcoin.core.WalletTest" name="encryptionDecryptionHomogenousKeys"/>
+  <testcase time="0.109" classname="com.google.bitcoin.core.WalletTest" name="replayWhilstPending"/>
+  <testcase time="0.1" classname="com.google.bitcoin.core.WalletTest" name="addUnencryptedKeyToEncryptedWallet"/>
+  <testcase time="0.448" classname="com.google.bitcoin.core.WalletTest" name="testEmptyRandomWallet"/>
+  <testcase time="0.159" classname="com.google.bitcoin.core.WalletTest" name="testCompleteTxWithExistingInputs"/>
+  <testcase time="0.123" classname="com.google.bitcoin.core.WalletTest" name="bounce"/>
+  <testcase time="0.25" classname="com.google.bitcoin.core.WalletTest" name="keyRotation"/>
+  <testcase time="0.386" classname="com.google.bitcoin.core.WalletTest" name="ageMattersDuringSelection"/>
+  <testcase time="0.096" classname="com.google.bitcoin.core.WalletTest" name="encryptionDecryptionBadPassword"/>
+  <testcase time="0.116" classname="com.google.bitcoin.core.WalletTest" name="spendToSameWallet"/>
+  <testcase time="0.133" classname="com.google.bitcoin.core.WalletTest" name="lastBlockSeen"/>
+  <testcase time="0.106" classname="com.google.bitcoin.core.WalletTest" name="keyCreationTime"/>
+  <testcase time="0.165" classname="com.google.bitcoin.core.WalletTest" name="doubleSpendFinneyAttack"/>
+  <testcase time="0.139" classname="com.google.bitcoin.core.WalletTest" name="respectMaxStandardSize"/>
+  <testcase time="0.144" classname="com.google.bitcoin.core.WalletTest" name="balance"/>
+  <testcase time="0.126" classname="com.google.bitcoin.core.WalletTest" name="watchingScriptsSentFrom"/>
+  <testcase time="0.162" classname="com.google.bitcoin.core.WalletTest" name="doubleSpendUnspendsOtherInputs"/>
+  <testcase time="0.13" classname="com.google.bitcoin.core.WalletTest" name="addEncryptedKeyToUnencryptedWallet"/>
+  <testcase time="0.168" classname="com.google.bitcoin.core.WalletTest" name="testCategory2WithChange"/>
+  <testcase time="0.143" classname="com.google.bitcoin.core.WalletTest" name="basicSpendingToP2SH"/>
+  <testcase time="0.107" classname="com.google.bitcoin.core.WalletTest" name="customTransactionSpending"/>
+  <testcase time="0.143" classname="com.google.bitcoin.core.WalletTest" name="blockChainCatchup"/>
+  <testcase time="0.117" classname="com.google.bitcoin.core.WalletTest" name="pending1"/>
+  <testcase time="0.11" classname="com.google.bitcoin.core.WalletTest" name="pending2"/>
+  <testcase time="0.101" classname="com.google.bitcoin.core.WalletTest" name="pending3"/>
+  <testcase time="0.108" classname="com.google.bitcoin.core.WalletTest" name="exceptionsDoNotBlockAllListeners"/>
+  <testcase time="0.102" classname="com.google.bitcoin.core.WalletTest" name="scriptCreationTime"/>
+  <testcase time="0.115" classname="com.google.bitcoin.core.WalletTest" name="autosaveImmediate"/>
+  <testcase time="0.142" classname="com.google.bitcoin.core.WalletTest" name="transactionsList"/>
+  <testcase time="0.175" classname="com.google.bitcoin.core.WalletTest" name="feePerKbCategoryJumpTest"/>
+  <testcase time="0.174" classname="com.google.bitcoin.core.WalletTest" name="testEmptyWallet"/>
+  <testcase time="0.157" classname="com.google.bitcoin.core.WalletTest" name="basicSpending"/>
+  <testcase time="5.074" classname="com.google.bitcoin.core.WalletTest" name="basicCategoryStepTest"/>
+  <testcase time="0.117" classname="com.google.bitcoin.core.WalletTest" name="cleanup"/>
+  <testcase time="3.132" classname="com.google.bitcoin.core.WalletTest" name="autosaveDelayed"/>
+  <testcase time="0.14" classname="com.google.bitcoin.core.WalletTest" name="doubleSpends"/>
+  <testcase time="0.112" classname="com.google.bitcoin.core.WalletTest" name="watchingScriptsBloomFilter"/>
+  <testcase time="0.126" classname="com.google.bitcoin.core.WalletTest" name="pubkeyOnlyScripts"/>
+  <testcase time="0.175" classname="com.google.bitcoin.core.WalletTest" name="basicSpendingWithEncryptedWallet"/>
+  <testcase time="0.105" classname="com.google.bitcoin.core.WalletTest" name="encryptionDecryptionCheckExceptions"/>
+  <testcase time="0.1" classname="com.google.bitcoin.core.WalletTest" name="isConsistent_duplicates"/>
+  <testcase time="0.172" classname="com.google.bitcoin.core.WalletTest" name="encryptionDecryptionBasic"/>
+  <testcase time="0.418" classname="com.google.bitcoin.core.WalletTest" name="feeSolverAndCoinSelectionTest"/>
+  <testcase time="0.103" classname="com.google.bitcoin.core.WalletTest" name="watchingScripts"/>
+  <testcase time="0.167" classname="com.google.bitcoin.core.WalletTest" name="completeTxPartiallySigned"/>
+  <testcase time="0.107" classname="com.google.bitcoin.core.WalletTest" name="transactions"/>
+</testsuite>
