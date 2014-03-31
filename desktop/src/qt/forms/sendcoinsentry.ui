@@ -161,13 +161,6 @@
       </property>
      </widget>
     </item>
-    <item row="4" column="0">
-     <widget class="QCheckBox" name="multifactorAuthCheckbox">
-      <property name="text">
-       <string>2FA</string>
-      </property>
-     </widget>
-    </item>
    </layout>
   </widget>
   <widget class="QFrame" name="SendCoins_InsecurePaymentRequest">
