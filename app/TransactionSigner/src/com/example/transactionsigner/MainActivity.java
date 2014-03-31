@@ -21,10 +21,15 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.bitcoin.core.Wallet;
+
 public class MainActivity extends Activity implements OnClickListener {
 
-	private Button scanBtn;
+	private Button scanBtn,getKeyBtn;
 	private TextView formatTxt, contentTxt;
+	
+	private WalletApp app;
+	private Wallet wallet;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +41,9 @@ public class MainActivity extends Activity implements OnClickListener {
         contentTxt = (TextView)findViewById(R.id.scan_content);
         
         scanBtn.setOnClickListener(this);
+        
+        getKeyBtn = (Button)findViewById(R.id.scan_key);
+        getKeyBtn.setOnClickListener(this);
        
     }
     
@@ -45,6 +53,10 @@ public class MainActivity extends Activity implements OnClickListener {
     		//scan
     		IntentIntegrator scanIntegrator = new IntentIntegrator(this);
     		scanIntegrator.initiateScan();
+    	}
+    	if(v.getId()==R.id.scan_key){
+    		//Create a public/private key pair
+    		
     	}
     }
     
