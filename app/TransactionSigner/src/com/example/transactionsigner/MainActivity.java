@@ -23,10 +23,10 @@ import android.widget.Toast;
 
 import com.google.bitcoin.core.Wallet;
 
-public class MainActivity extends Activity implements OnClickListener {
+public class MainActivity extends AbstractWalletActivity implements OnClickListener {
 
 	private Button scanBtn,getKeyBtn;
-	private TextView formatTxt, contentTxt;
+	private TextView formatTxt, contentTxt,addressText,pubKeyText;
 	
 	private WalletApp app;
 	private Wallet wallet;
@@ -36,6 +36,10 @@ public class MainActivity extends Activity implements OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        
+        //app = getWalletApp();
+        //wallet = app.getWallet();
+        
         scanBtn = (Button)findViewById(R.id.scan_button);
         formatTxt = (TextView)findViewById(R.id.scan_format);
         contentTxt = (TextView)findViewById(R.id.scan_content);
@@ -43,9 +47,22 @@ public class MainActivity extends Activity implements OnClickListener {
         scanBtn.setOnClickListener(this);
         
         getKeyBtn = (Button)findViewById(R.id.scan_key);
+        addressText = (TextView)findViewById(R.id.key_text);
+        pubKeyText = (TextView)findViewById(R.id.pubKeyTxt);
         getKeyBtn.setOnClickListener(this);
+        
        
     }
+    
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+
+		//getWalletApplication().startBlockchainService(true);
+
+		//checkLowStorageAlert();
+	}
     
     public void onClick(View v){
     	//respond to clicks
@@ -56,7 +73,9 @@ public class MainActivity extends Activity implements OnClickListener {
     	}
     	if(v.getId()==R.id.scan_key){
     		//Create a public/private key pair
-    		
+    		//app.addNewKeyToWallet();
+    		//addressText.setText("ADDRESS: " + app.getAddressOf(0).toString());
+    		//pubKeyText.setText("PUBLIC KEY: " + app.getWallet());//TODO: Just print pub key here
     	}
     }
     

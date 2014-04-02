@@ -26,8 +26,23 @@
     android:id="@+id/scan_key"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_alignTop="@+id/scan_content"
+    android:layout_below="@+id/scan_content"
     android:layout_centerHorizontal="true"
     android:text="@string/getKey" />
 
+<TextView
+    android:id="@+id/key_text"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textIsSelectable="true"
+    android:layout_centerHorizontal="true"
+    android:layout_below="@id/scan_key" />
+
+<TextView
+    android:id="@+id/pubKeyTxt"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textIsSelectable="true"
+    android:layout_centerHorizontal="true"
+    android:layout_below="@id/key_text" />
 </RelativeLayout>
