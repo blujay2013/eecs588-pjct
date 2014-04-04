@@ -6,6 +6,7 @@
 #define SENDCOINSDIALOG_H
 
 #include "walletmodel.h"
+//#include "askprivkeydialog.h"
 
 #include <QDialog>
 #include <QString>
@@ -48,11 +49,13 @@ public slots:
     SendCoinsEntry *addEntry();
     void updateTabsAndLabels();
     void setBalance(qint64 balance, qint64 unconfirmedBalance, qint64 immatureBalance);
+    //void addPrivKey();
 
 private:
     Ui::SendCoinsDialog *ui;
     WalletModel *model;
     bool fNewRecipientAllowed;
+    //AskPrivKeyDialog *privKeyDialog;
 
     // Process WalletModel::SendCoinsReturn and generate a pair consisting
     // of a message and message flags for use in emit message().

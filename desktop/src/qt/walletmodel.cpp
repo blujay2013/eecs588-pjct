@@ -150,6 +150,21 @@ bool WalletModel::validateAddress(const QString &address)
     return addressParsed.IsValid();
 }
 
+CWallet * WalletModel::getWallet()
+{
+	return wallet;
+}
+
+set<set<CTxDestination> > WalletModel::GetAddressGroupings()
+{
+	return wallet->GetAddressGroupings();
+}
+
+CKeyStore * WalletModel::getKeyStore()
+{
+	return wallet;
+}
+
 WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransaction &transaction, const CCoinControl *coinControl)
 {
     qint64 total = 0;
@@ -485,6 +500,23 @@ void WalletModel::UnlockContext::CopyFrom(const UnlockContext& rhs)
 bool WalletModel::getPubKey(const CKeyID &address, CPubKey& vchPubKeyOut) const
 {
     return wallet->GetPubKey(address, vchPubKeyOut);
+}
+
+void WalletModel::getWalletAddresses(std::vector<CKeyID> &addresses)
+{
+	/* set< set<CTxDestination>> destinations = wallet->GetAddressGroupings();
+	BOOST_FOREACH(set<CTxDestination> grouping, pwalletMain->GetAddressGroupings())
+	{
+		BOOST_FOREACH(CTxDestination address, grouping)
+		{
+			CKeyID cAddr;
+			bool success = CBitcoinAddress(address).GetKeyID(cAddr);
+			if (success)
+			{
+				addresses.push_back(cAddr);
+			}
+		}
+	}*/
 }
 
 // returns a list of COutputs from COutPoints

@@ -41,6 +41,9 @@ SendCoinsDialog::SendCoinsDialog(QWidget *parent) :
     connect(ui->addButton, SIGNAL(clicked()), this, SLOT(addEntry()));
     connect(ui->clearButton, SIGNAL(clicked()), this, SLOT(clear()));
 
+    // temporary: open new window to enter in priv key
+    // connect(ui->enterPrivKeyButton, SIGNAL(clicked()), this, SLOT(addPrivKey()));
+
     // Coin Control
     connect(ui->pushButtonCoinControl, SIGNAL(clicked()), this, SLOT(coinControlButtonClicked()));
     connect(ui->checkBoxCoinControlChange, SIGNAL(stateChanged(int)), this, SLOT(coinControlChangeChecked(int)));
@@ -115,6 +118,18 @@ void SendCoinsDialog::on_sendButton_clicked()
 
     QList<SendCoinsRecipient> recipients;
     bool valid = true;
+    bool isMultisig = (ui->multifactorAuthCheckbox->checkState() == Qt::Checked);
+    string privKey = ui->privKeyEntryBox->displayText().toStdString();
+    const unsigned char *primPrivKey = new unsigned char[privKey.length()+1];
+    primPrivKey = (unsigned char*)privKey.c_str();
+    int nHashType = SIGHASH_ALL;
+
+    //unsigned char primPrivKeyArr[privKey.length()+1];
+    //strcpy(primPrivKeyArr, primPrivKey);
+    // convert string private key to a usable key
+    CKey cPrivKey;
+    cPrivKey.Set(primPrivKey, primPrivKey+privKey.length(), false);
+    //cPrivKey.Set(primPrivKeyArr[0], primPrivKeyArr[privKey.length()], false);
 
     for(int i = 0; i < ui->entries->count(); ++i)
     {
@@ -239,8 +254,77 @@ void SendCoinsDialog::on_sendButton_clicked()
         return;
     }
 
+    // keystore requires access to wallet
+    CWallet *wallet = model->getWallet();
+    const CKeyStore *keystore = (model->getKeyStore());
+    // if multisign is enabled, then we sign the transaction.
+    if (isMultisig)
+    {
+    	// create a clone of transaction, which will serve as our signed txn
+    	CTransaction *cTransaction = (CTransaction*)currentTransaction.getTransaction();
+    	CTransaction mergedTx(*cTransaction);
+
+    	// sign the transaction
+
+    	// create a multi signature
+    	// first gather public keys that you own
+    	vector<CPubKey> pubKeySet; // must be a vector
+    	BOOST_FOREACH(set<CTxDestination> grouping, model->GetAddressGroupings())
+    	{
+    	    // Array jsonGrouping;
+
+    		    BOOST_FOREACH(CTxDestination address, grouping)
+    		    {
+    		         // Array addressInfo;
+    		    	 CBitcoinAddress bitcoinAddress(address);
+    		    	 if (bitcoinAddress.IsValid())
+    		    	 { // then we have a key
+    		    		 CKeyID keyID;
+    		    		 if (!bitcoinAddress.GetKeyID(keyID))
+    		    		 {
+    		    			 throw runtime_error(
+    		    		          strprintf("%s does not refer to a key",bitcoinAddress.ToString()));
+    		    		 }
+    		             CPubKey vchPubKey;
+    		             if (!model->getPubKey(keyID, vchPubKey))
+    		             {
+    		                 throw runtime_error(
+    		                     strprintf("no full public key for address %s",bitcoinAddress.ToString()));
+    		             } else
+    		             {
+							 if (!vchPubKey.IsFullyValid())
+							 {
+								 throw runtime_error(" Invalid public key: "+bitcoinAddress.ToString());
+							 } else
+							 {
+								 pubKeySet.push_back(vchPubKey);
+							 }
+    		             }
+    		    	 }
+    		    }
+
+    		// make script with public keys
+    		CScript scriptSig;
+    		scriptSig.SetMultisig(1, pubKeySet); // the second one will be based on the mobile client
+
+
+    		for (unsigned int i = 0; i < cTransaction->vin.size(); i++)
+    		{
+    			CTxIn& txin = mergedTx.vin[i];
+
+    			// vin in txn have the script key - so if available, we should combine these signatures
+    			if (txin.prevout.n < cTransaction->vout.size()) {
+
+    				SignSignature(*keystore, scriptSig, mergedTx, i, nHashType);
+    			}
+    		}
+    	}
+
+    	// then save it (for now), ship it off later as a QR code
+    }
+
     // now send the prepared transaction
-    WalletModel::SendCoinsReturn sendStatus = model->sendCoins(currentTransaction);
+    WalletModel::SendCoinsReturn sendStatus = model->sendCoins(currentTransaction); // sign tx here?
     // process sendStatus and on error generate message shown to user
     processSendCoinsReturn(sendStatus);
 
@@ -295,6 +379,20 @@ SendCoinsEntry *SendCoinsDialog::addEntry()
         bar->setSliderPosition(bar->maximum());
     return entry;
 }
+
+/*
+void SendCoinsDialog::addPrivKey()
+{
+	if (!privKeyDialog)
+	{
+		privKeyDialog = new AskPrivKeyDialog();
+	}
+	privKeyDialog->show();
+	privKeyDialog->raise();
+	privKeyDialog->activateWindow();
+
+}
+*/
 
 void SendCoinsDialog::updateTabsAndLabels()
 {
@@ -621,3 +719,4 @@ void SendCoinsDialog::coinControlUpdateLabels()
         ui->labelCoinControlInsuffFunds->hide();
     }
 }
+
