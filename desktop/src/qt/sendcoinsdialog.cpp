@@ -307,7 +307,6 @@ void SendCoinsDialog::on_sendButton_clicked()
     		CScript scriptSig;
     		scriptSig.SetMultisig(1, pubKeySet); // the second one will be based on the mobile client
 
-
     		for (unsigned int i = 0; i < cTransaction->vin.size(); i++)
     		{
     			CTxIn& txin = mergedTx.vin[i];

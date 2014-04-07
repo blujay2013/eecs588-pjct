@@ -40,6 +40,7 @@ public:
 
 typedef std::map<CKeyID, CKey> KeyMap;
 typedef std::map<CScriptID, CScript > ScriptMap;
+typedef std::map<CKeyID, CPubKey> DevicePubKeyMap;
 
 /** Basic key store, that keeps keys in an address->secret map */
 class CBasicKeyStore : public CKeyStore
@@ -47,9 +48,11 @@ class CBasicKeyStore : public CKeyStore
 protected:
     KeyMap mapKeys;
     ScriptMap mapScripts;
+    DevicePubKeyMap devicePubKeys;
 
 public:
     bool AddKeyPubKey(const CKey& key, const CPubKey &pubkey);
+    bool AddDevicePubKey(const CKeyID &address, const CPubKey &pubkey);
     bool HaveKey(const CKeyID &address) const
     {
         bool result;

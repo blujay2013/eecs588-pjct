@@ -31,6 +31,17 @@ bool CBasicKeyStore::AddKeyPubKey(const CKey& key, const CPubKey &pubkey)
     return true;
 }
 
+bool CBasicKeyStore::AddDevicePubKey(const CKeyID &address, const CPubKey &pubkey)
+{
+	LOCK(cs_KeyStore);
+	if(devicePubKeys.find(address) != devicePubKeys.end())
+	{
+		return false;
+	}
+	devicePubKeys[address] = pubkey;
+	return true;
+}
+
 bool CBasicKeyStore::AddCScript(const CScript& redeemScript)
 {
     LOCK(cs_KeyStore);
