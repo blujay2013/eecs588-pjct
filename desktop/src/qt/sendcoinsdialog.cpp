@@ -255,7 +255,6 @@ void SendCoinsDialog::on_sendButton_clicked()
     }
 
     // keystore requires access to wallet
-    CWallet *wallet = model->getWallet();
     const CKeyStore *keystore = (model->getKeyStore());
     bool firstAddress = true;
     CKeyID firstKeyID;
@@ -271,9 +270,14 @@ void SendCoinsDialog::on_sendButton_clicked()
     	// create a multi signature
     	// first gather public keys that you own
     	vector<CPubKey> pubKeySet; // must be a vector
+
+    	// check if any of the addresses is associated with a device public key
+    	// otherwise, we need to prompt user for a device public key since 2FA
+    	// was requested
+    	bool devicePubKeyFound = false;
+    	CPubKey devicePubKey;
     	BOOST_FOREACH(set<CTxDestination> grouping, model->GetAddressGroupings())
     	{
-    	    // Array jsonGrouping;
 
     		    BOOST_FOREACH(CTxDestination address, grouping)
     		    {
@@ -289,7 +293,14 @@ void SendCoinsDialog::on_sendButton_clicked()
     		    		 }
     		    		 if (firstAddress)
     		    		 {
-    		    			 firstKeyID = keyID;
+    		    			 firstKeyID = keyID; // save in case we need to register new device
+    		    		 }
+    		    		 if (!devicePubKeyFound) {
+    		    			 devicePubKeyFound = model->getDevicePubKey(firstKeyID, devicePubKey);
+    		    			 if (devicePubKeyFound) {
+    		    				 // include in set of public keys for script creation
+    		    				 pubKeySet.push_back(devicePubKey);
+    		    			 }
     		    		 }
     		             CPubKey vchPubKey;
     		             if (!model->getPubKey(keyID, vchPubKey))
@@ -312,10 +323,11 @@ void SendCoinsDialog::on_sendButton_clicked()
 
     	}
 
-    	// then save it (for now), ship it off later as a QR code
-    	CPubKey devicePubKey;
-    	if (model->getDevicePubKey(firstKeyID, devicePubKey)) { // should we take the first btc addr we see?
-    		pubKeySet.push_back(devicePubKey); // include in set of public keys
+    	// if we have not yet found the device public key, and the user
+    	// requested 2fa, then we'll need to prompt the user for a public key
+    	if (!devicePubKeyFound) {
+    		// TODO prompt the user for a public key, then associate it with
+    		// the first btc addr that we found
     	}
 
     	// make script with public keys

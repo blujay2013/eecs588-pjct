@@ -150,11 +150,6 @@ bool WalletModel::validateAddress(const QString &address)
     return addressParsed.IsValid();
 }
 
-CWallet * WalletModel::getWallet()
-{
-	return wallet;
-}
-
 set<set<CTxDestination> > WalletModel::GetAddressGroupings()
 {
 	return wallet->GetAddressGroupings();
