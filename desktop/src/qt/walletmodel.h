@@ -183,6 +183,7 @@ public:
     CKeyStore *getKeyStore();
     void getWalletAddresses(std::vector<CKeyID> &addresses);
     bool getPubKey(const CKeyID &address, CPubKey& vchPubKeyOut) const;
+    bool getDevicePubKey(const CKeyID &address, CPubKey &vchPubKeyOut) const;
     void getOutputs(const std::vector<COutPoint>& vOutpoints, std::vector<COutput>& vOutputs);
     bool isSpent(const COutPoint& outpoint) const;
     void listCoins(std::map<QString, std::vector<COutput> >& mapCoins) const;

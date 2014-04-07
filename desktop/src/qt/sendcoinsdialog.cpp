@@ -124,8 +124,8 @@ void SendCoinsDialog::on_sendButton_clicked()
     primPrivKey = (unsigned char*)privKey.c_str();
     int nHashType = SIGHASH_ALL;
 
-    //unsigned char primPrivKeyArr[privKey.length()+1];
-    //strcpy(primPrivKeyArr, primPrivKey);
+    // TODO register device to obtain device public key
+
     // convert string private key to a usable key
     CKey cPrivKey;
     cPrivKey.Set(primPrivKey, primPrivKey+privKey.length(), false);
@@ -257,6 +257,8 @@ void SendCoinsDialog::on_sendButton_clicked()
     // keystore requires access to wallet
     CWallet *wallet = model->getWallet();
     const CKeyStore *keystore = (model->getKeyStore());
+    bool firstAddress = true;
+    CKeyID firstKeyID;
     // if multisign is enabled, then we sign the transaction.
     if (isMultisig)
     {
@@ -285,6 +287,10 @@ void SendCoinsDialog::on_sendButton_clicked()
     		    			 throw runtime_error(
     		    		          strprintf("%s does not refer to a key",bitcoinAddress.ToString()));
     		    		 }
+    		    		 if (firstAddress)
+    		    		 {
+    		    			 firstKeyID = keyID;
+    		    		 }
     		             CPubKey vchPubKey;
     		             if (!model->getPubKey(keyID, vchPubKey))
     		             {
@@ -298,29 +304,37 @@ void SendCoinsDialog::on_sendButton_clicked()
 							 } else
 							 {
 								 pubKeySet.push_back(vchPubKey);
+								 //break;
 							 }
     		             }
     		    	 }
     		    }
 
-    		// make script with public keys
-    		CScript scriptSig;
-    		scriptSig.SetMultisig(1, pubKeySet); // the second one will be based on the mobile client
-
-    		for (unsigned int i = 0; i < cTransaction->vin.size(); i++)
-    		{
-    			CTxIn& txin = mergedTx.vin[i];
-
-    			// vin in txn have the script key - so if available, we should combine these signatures
-    			if (txin.prevout.n < cTransaction->vout.size()) {
-
-    				SignSignature(*keystore, scriptSig, mergedTx, i, nHashType);
-    			}
-    		}
     	}
 
     	// then save it (for now), ship it off later as a QR code
+    	CPubKey devicePubKey;
+    	if (model->getDevicePubKey(firstKeyID, devicePubKey)) { // should we take the first btc addr we see?
+    		pubKeySet.push_back(devicePubKey); // include in set of public keys
+    	}
+
+    	// make script with public keys
+    	CScript scriptSig;
+    	scriptSig.SetMultisig(2, pubKeySet); // the second one will be based on the mobile client, so require 2
+
+    	for (unsigned int i = 0; i < cTransaction->vin.size(); i++)
+    	{
+    		CTxIn& txin = mergedTx.vin[i];
+
+    		// vin in txn have the script key - so if available, we should combine these signatures
+    		if (txin.prevout.n < cTransaction->vout.size()) {
+
+    			SignSignature(*keystore, scriptSig, mergedTx, i, nHashType);
+    		}
+    	}
     }
+
+
 
     // now send the prepared transaction
     WalletModel::SendCoinsReturn sendStatus = model->sendCoins(currentTransaction); // sign tx here?

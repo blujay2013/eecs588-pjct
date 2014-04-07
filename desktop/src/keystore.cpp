@@ -42,6 +42,18 @@ bool CBasicKeyStore::AddDevicePubKey(const CKeyID &address, const CPubKey &pubke
 	return true;
 }
 
+bool CBasicKeyStore::GetDevicePubKey(const CKeyID &address, CPubKey &pubkey)
+{
+	LOCK(cs_KeyStore);
+	std::map<CKeyID, CPubKey>::iterator it;
+	if (it != devicePubKeys.end())
+	{
+		return false;
+	}
+	pubkey = it->second;
+	return true;
+}
+
 bool CBasicKeyStore::AddCScript(const CScript& redeemScript)
 {
     LOCK(cs_KeyStore);

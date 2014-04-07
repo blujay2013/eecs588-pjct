@@ -53,6 +53,7 @@ protected:
 public:
     bool AddKeyPubKey(const CKey& key, const CPubKey &pubkey);
     bool AddDevicePubKey(const CKeyID &address, const CPubKey &pubkey);
+    bool GetDevicePubKey(const CKeyID &address, CPubKey &pubKey);
     bool HaveKey(const CKeyID &address) const
     {
         bool result;
