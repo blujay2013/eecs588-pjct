@@ -31,7 +31,7 @@ public:
         EditSendingAddress
     };
 
-    explicit EditAddressDialog(Mode mode, QWidget *parent);
+    explicit EditAddressDialog(Mode mode, QWidget *parent, bool multisig = false);
     ~EditAddressDialog();
 
     void setModel(AddressTableModel *model);
@@ -52,6 +52,7 @@ private:
     AddressTableModel *model;
 
     QString address;
+    bool multisig;
 };
 
 #endif // EDITADDRESSDIALOG_H

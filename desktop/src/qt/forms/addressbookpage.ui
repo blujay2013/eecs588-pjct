@@ -66,6 +66,17 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="newMultiSigAddress">
+       <property name="text">
+        <string>New &amp;MultiSig</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../bitcoin.qrc">
+         <normaloff>:/icons/add</normaloff>:/icons/add</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="copyAddress">
        <property name="toolTip">
         <string>Copy the currently selected address to the system clipboard</string>

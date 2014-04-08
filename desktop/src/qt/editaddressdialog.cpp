@@ -11,12 +11,15 @@
 #include <QDataWidgetMapper>
 #include <QMessageBox>
 
-EditAddressDialog::EditAddressDialog(Mode mode, QWidget *parent) :
+#include "walletmodel.h"
+#include "keystore.h"
+EditAddressDialog::EditAddressDialog(Mode mode, QWidget *parent, bool multisig) :
     QDialog(parent),
     ui(new Ui::EditAddressDialog),
     mapper(0),
     mode(mode),
-    model(0)
+    model(0),
+    multisig(multisig)
 {
     ui->setupUi(this);
 
@@ -38,6 +41,17 @@ EditAddressDialog::EditAddressDialog(Mode mode, QWidget *parent) :
     case EditSendingAddress:
         setWindowTitle(tr("Edit sending address"));
         break;
+    }
+    if(!multisig)
+    {
+	ui->label_3->hide();
+	ui->addressEdit_2->hide();
+    }
+    else
+    {
+	//when creating multi-sig addresses, user needs to be able to enter both addresses manually, for now at least
+	ui->addressEdit->setEnabled(true);
+        setWindowTitle(tr("New multisig address"));	
     }
 
     mapper = new QDataWidgetMapper(this);
@@ -92,6 +106,14 @@ bool EditAddressDialog::saveCurrentRow()
 
 void EditAddressDialog::accept()
 {
+    if(multisig)
+    {
+	//override default behavior if multisig for now
+	std::vector<CPubKey> pubkeys;
+	CScript result;
+	result.SetMultisig(2, pubkeys);
+	return;
+    }
     if(!model)
         return;
 

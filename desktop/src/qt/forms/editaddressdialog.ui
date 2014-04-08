@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>457</width>
-    <height>126</height>
+    <height>140</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,7 +36,17 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="addressEdit_2"/>
+     </item>
+     <item row="2" column="1">
+      <widget class="QValidatedLineEdit" name="addressEdit">
+       <property name="toolTip">
+        <string>The address associated with this address list entry. This can only be modified for sending addresses.</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
       <widget class="QLabel" name="label_2">
        <property name="text">
         <string>&amp;Address</string>
@@ -46,10 +56,13 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QValidatedLineEdit" name="addressEdit">
-       <property name="toolTip">
-        <string>The address associated with this address list entry. This can only be modified for sending addresses.</string>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Address2</string>
+       </property>
+       <property name="buddy">
+        <cstring>addressEdit_2</cstring>
        </property>
       </widget>
      </item>

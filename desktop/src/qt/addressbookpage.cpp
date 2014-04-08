@@ -94,6 +94,7 @@ AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
     connect(ui->tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextualMenu(QPoint)));
 
     connect(ui->closeButton, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(ui->newMultiSigAddress, SIGNAL(clicked()), this, SLOT(on_newMultiSigAddress_clicked()));
 }
 
 AddressBookPage::~AddressBookPage()
@@ -186,6 +187,22 @@ void AddressBookPage::on_newAddress_clicked()
         tab == SendingTab ?
         EditAddressDialog::NewSendingAddress :
         EditAddressDialog::NewReceivingAddress, this);
+    dlg.setModel(model);
+    if(dlg.exec())
+    {
+        newAddressToSelect = dlg.getAddress();
+    }
+}
+
+void AddressBookPage::on_newMultiSigAddress_clicked()
+{
+    if(!model)
+        return;
+
+    EditAddressDialog dlg(
+        tab == SendingTab ?
+        EditAddressDialog::NewSendingAddress :
+        EditAddressDialog::NewReceivingAddress, this, true);
     dlg.setModel(model);
     if(dlg.exec())
     {

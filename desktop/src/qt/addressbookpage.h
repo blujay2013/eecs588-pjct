@@ -64,6 +64,8 @@ private slots:
     void on_deleteAddress_clicked();
     /** Create a new address for receiving coins and / or add a new address book entry */
     void on_newAddress_clicked();
+    /** Create a new multi-sig address for receiving coins */
+    void on_newMultiSigAddress_clicked();
     /** Copy address of currently selected address entry to clipboard */
     void on_copyAddress_clicked();
     /** Copy label of currently selected address entry to clipboard (no button) */
