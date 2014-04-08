@@ -6,6 +6,7 @@
 #define SENDCOINSENTRY_H
 
 #include "walletmodel.h"
+#include "askdevicepublickey.h"
 
 #include <QStackedWidget>
 
@@ -61,6 +62,7 @@ private slots:
 
 private:
     SendCoinsRecipient recipient;
+    AskDevicePublicKey *askDevicePublicKey;
     Ui::SendCoinsEntry *ui;
     WalletModel *model;
 

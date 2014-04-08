@@ -16,6 +16,11 @@ FORMS += \
     ../src/qt/forms/sendcoinsentry.ui \
     ../src/qt/forms/signverifymessagedialog.ui \
     ../src/qt/forms/transactiondescdialog.ui \
+    ../src/qt/forms/askdevicepublickey.ui
 
 RESOURCES += \
     ../src/qt/bitcoin.qrc
+
+HEADERS +=
+
+SOURCES +=

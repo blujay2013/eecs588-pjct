@@ -13,6 +13,7 @@
 
 #include <stdexcept>
 #include <vector>
+#include <iostream>
 
 // secp256k1:
 // const unsigned int PRIVATE_KEY_SIZE = 279;

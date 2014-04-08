@@ -405,20 +405,6 @@ SendCoinsEntry *SendCoinsDialog::addEntry()
     return entry;
 }
 
-/*
-void SendCoinsDialog::addPrivKey()
-{
-	if (!privKeyDialog)
-	{
-		privKeyDialog = new AskPrivKeyDialog();
-	}
-	privKeyDialog->show();
-	privKeyDialog->raise();
-	privKeyDialog->activateWindow();
-
-}
-*/
-
 void SendCoinsDialog::updateTabsAndLabels()
 {
     setupTabChain(0);
