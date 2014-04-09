@@ -35,10 +35,6 @@ SendCoinsEntry::SendCoinsEntry(QWidget *parent) :
     // just a label for displaying bitcoin address(es)
     ui->payTo_is->setFont(GUIUtil::bitcoinAddressFont());
 
-    askDevicePublicKey = new AskDevicePublicKey();
-    askDevicePublicKey->show();
-    askDevicePublicKey->raise();
-    askDevicePublicKey->activateWindow();
 }
 
 SendCoinsEntry::~SendCoinsEntry()
