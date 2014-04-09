@@ -18,19 +18,25 @@ AskDevicePublicKey::~AskDevicePublicKey()
 void AskDevicePublicKey::textChangedSlot(QString text)
 {
 	std::string pubKey = text.toStdString();
-	std::vector<unsigned char> pubKeyData(pubKey.begin(), pubKey.end());
-	CPubKey cPubKeyBuf(pubKey.begin(), pubKey.end());
-	//cPubKey = cPubKeyBuf;
-	std::cout << "Public key is currently " << pubKey << " (size " << cPubKeyBuf.size() << ")";
+	if (IsHex(pubKey))
+	{
+		std::cout << "Hex detected\n";
+		std::vector<unsigned char> pubKeyData(pubKey.begin(), pubKey.end());
+			CPubKey cPubKeyBuf(ParseHex(pubKey));
+			//cPubKey = cPubKeyBuf;
+			std::cout << "Public key is currently " << pubKey << " (size " << cPubKeyBuf.size() << ")";
 
-	if (cPubKeyBuf.IsValid())
-	{
-		std::cout << "Public key is valid: " << cPubKeyBuf.begin() << "\n";
-		ui->buttonBox->setVisible(true);//->button(QDialogButtonBox::Ok)->setEnabled(true);
-	} else
-	{
-		std::cout << "Public key is not valid: " << cPubKeyBuf.begin() << "\n";
-		ui->buttonBox->setVisible(false);//->button(QDialogButtonBox::Ok)->setEnabled(false);
+			if (cPubKeyBuf.IsValid())
+			{
+				std::cout << "Public key is valid: " << cPubKeyBuf.begin() << "\n";
+				ui->buttonBox->setVisible(true);//->button(QDialogButtonBox::Ok)->setEnabled(true);
+			} else
+			{
+				std::cout << "Public key is not valid: " << cPubKeyBuf.begin() << "\n";
+				ui->buttonBox->setVisible(false);//->button(QDialogButtonBox::Ok)->setEnabled(false);
+			}
+	} else {
+		std::cout << "Not a hex\n";
 	}
 }
 
