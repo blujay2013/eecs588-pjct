@@ -119,17 +119,10 @@ void SendCoinsDialog::on_sendButton_clicked()
     QList<SendCoinsRecipient> recipients;
     bool valid = true;
     bool isMultisig = (ui->multifactorAuthCheckbox->checkState() == Qt::Checked);
-    string privKey = ui->privKeyEntryBox->displayText().toStdString();
-    const unsigned char *primPrivKey = new unsigned char[privKey.length()+1];
-    primPrivKey = (unsigned char*)privKey.c_str();
+    //string privKey = ui->privKeyEntryBox->displayText().toStdString();
+    //const unsigned char *primPrivKey = new unsigned char[privKey.length()+1];
+    //primPrivKey = (unsigned char*)privKey.c_str();
     int nHashType = SIGHASH_ALL;
-
-    // TODO register device to obtain device public key
-
-    // convert string private key to a usable key
-    CKey cPrivKey;
-    cPrivKey.Set(primPrivKey, primPrivKey+privKey.length(), false);
-    //cPrivKey.Set(primPrivKeyArr[0], primPrivKeyArr[privKey.length()], false);
 
     for(int i = 0; i < ui->entries->count(); ++i)
     {
@@ -190,7 +183,6 @@ void SendCoinsDialog::on_sendButton_clicked()
     }
 
     fNewRecipientAllowed = false;
-
 
     WalletModel::UnlockContext ctx(model->requestUnlock());
     if(!ctx.isValid())
@@ -263,6 +255,7 @@ void SendCoinsDialog::on_sendButton_clicked()
     {
     	// create a clone of transaction, which will serve as our signed txn
     	CTransaction *cTransaction = (CTransaction*)currentTransaction.getTransaction();
+
     	CTransaction mergedTx(*cTransaction);
 
     	// sign the transaction
@@ -344,9 +337,17 @@ void SendCoinsDialog::on_sendButton_clicked()
     			SignSignature(*keystore, scriptSig, mergedTx, i, nHashType);
     		}
     	}
+
+    	// get hash of transaction
+    	//uint256 hashTx = mergedTx.GetHash();
+    	//std::string hexHashTx = hashTx.GetHex();
+    	//std::cout << "Hex hash of tx: " << hexHashTx << "\n";
+
+    	CDataStream serializedTx(SER_NETWORK, PROTOCOL_VERSION);
+    	serializedTx << mergedTx;
+    	std::string serializedTxHex = HexStr(serializedTx.begin(), serializedTx.end());
+    	std::cout << "Serialized signed tx hex: " << serializedTxHex << "\n";
     }
-
-
 
     // now send the prepared transaction
     WalletModel::SendCoinsReturn sendStatus = model->sendCoins(currentTransaction); // sign tx here?
