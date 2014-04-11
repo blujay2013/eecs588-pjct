@@ -199,15 +199,10 @@ void AddressBookPage::on_newMultiSigAddress_clicked()
     if(!model)
         return;
 
-    EditAddressDialog dlg(
-        tab == SendingTab ?
-        EditAddressDialog::NewSendingAddress :
-        EditAddressDialog::NewReceivingAddress, this, true);
-    dlg.setModel(model);
-    if(dlg.exec())
-    {
-        newAddressToSelect = dlg.getAddress();
-    }
+    AskDevicePublicKey * pubKeyDlg= new AskDevicePublicKey(model);
+    pubKeyDlg->show();
+    pubKeyDlg->raise();
+    pubKeyDlg->activateWindow();
 }
 
 void AddressBookPage::on_deleteAddress_clicked()

@@ -15,6 +15,7 @@
 
 const QString AddressTableModel::Send = "S";
 const QString AddressTableModel::Receive = "R";
+const QString AddressTableModel::DeviceTwoFactor = "D";
 
 struct AddressTableEntry
 {
@@ -385,12 +386,53 @@ QString AddressTableModel::addRow(const QString &type, const QString &label, con
         }
         strAddress = CBitcoinAddress(newKey.GetID()).ToString();
     }
+    else if(type == DeviceTwoFactor)
+    {
+	cout << "Generating new address to combine with given public key"<< endl;
+        // Generate a new address to combine with entered pubkey for multisig
+        CPubKey newKey;
+	// Right now we are assuming user will enter public key, so strAddress has the public key actually.
+	CPubKey devicePubKey(ParseHex(strAddress));
+        if(!wallet->GetKeyFromPool(newKey))
+        {
+            WalletModel::UnlockContext ctx(walletModel->requestUnlock());
+            if(!ctx.isValid())
+            {
+                // Unlock wallet failed or was cancelled
+                editStatus = WALLET_UNLOCK_FAILURE;
+                return QString();
+            }
+            if(!wallet->GetKeyFromPool(newKey))
+            {
+                editStatus = KEY_GENERATION_FAILURE;
+                return QString();
+            }
+        }
+	//create multi-sig address here instead, using two pubkeys I have now
+	cout << "Creating new multi-sig address/script now" << endl;
+	std::vector<CPubKey> pubkeys;
+	pubkeys.push_back(newKey);
+	pubkeys.push_back(devicePubKey);
+	CScript result;
+	result.SetMultisig(2, pubkeys);
+	cout << "Redeem script created" << endl;
+	CScriptID resultID = result.GetID();
+	CBitcoinAddress strAddress(resultID);
+        LOCK(wallet->cs_wallet);
+	wallet->AddCScript(result);
+	strLabel = "2-fa address";
+	wallet->SetAddressBook(resultID, strLabel, "receive");
+
+        //strAddress = CBitcoinAddress(newKey.GetID()).ToString();
+	
+    }
     else
     {
         return QString();
     }
 
     // Add entry
+    if (type == Send || type == Receive)
     {
         LOCK(wallet->cs_wallet);
         wallet->SetAddressBook(CBitcoinAddress(strAddress).Get(), strLabel,

@@ -6,6 +6,7 @@
 #include <iostream>
 #include "key.h"
 #include "util.h"
+class AddressTableModel;
 
 namespace Ui {
 	class AskDevicePublicKey;
@@ -16,7 +17,7 @@ class AskDevicePublicKey : public QDialog
 	Q_OBJECT
 
 	public:
-		explicit AskDevicePublicKey(QWidget *parent = 0);
+    explicit AskDevicePublicKey(AddressTableModel *model, QWidget *parent = 0);
 		~AskDevicePublicKey();
 		bool getPubKey(CPubKey &myCPubKey);
 
@@ -26,7 +27,7 @@ class AskDevicePublicKey : public QDialog
 	private:
 		Ui::AskDevicePublicKey *ui;
 		CPubKey cPubKey;
-
+		AddressTableModel *model;
 	private slots:
 		void on_buttonBox_clicked();
 };

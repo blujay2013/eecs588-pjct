@@ -6,6 +6,7 @@
 #define ADDRESSBOOKPAGE_H
 
 #include <QDialog>
+#include "askdevicepublickey.h"
 
 class AddressTableModel;
 class OptionsModel;

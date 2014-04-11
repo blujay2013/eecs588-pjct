@@ -49,11 +49,13 @@ EditAddressDialog::EditAddressDialog(Mode mode, QWidget *parent, bool multisig) 
     }
     else
     {
+	ui->label_2->setText("Public key 1");
+	ui->label_3->setText("Public key 2");
 	//when creating multi-sig addresses, user needs to be able to enter both addresses manually, for now at least
 	ui->addressEdit->setEnabled(true);
         setWindowTitle(tr("New multisig address"));	
     }
-
+    
     mapper = new QDataWidgetMapper(this);
     mapper->setSubmitPolicy(QDataWidgetMapper::ManualSubmit);
 }
@@ -106,14 +108,6 @@ bool EditAddressDialog::saveCurrentRow()
 
 void EditAddressDialog::accept()
 {
-    if(multisig)
-    {
-	//override default behavior if multisig for now
-	std::vector<CPubKey> pubkeys;
-	CScript result;
-	result.SetMultisig(2, pubkeys);
-	return;
-    }
     if(!model)
         return;
 

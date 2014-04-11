@@ -45,7 +45,7 @@ public:
 
     static const QString Send;      /**< Specifies send address */
     static const QString Receive;   /**< Specifies receive address */
-
+    static const QString DeviceTwoFactor;  /**< Specifies two-factor auth address */
     /** @name Methods overridden from QAbstractTableModel
         @{*/
     int rowCount(const QModelIndex &parent) const;
