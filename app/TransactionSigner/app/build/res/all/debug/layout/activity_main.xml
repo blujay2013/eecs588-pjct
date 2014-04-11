@@ -1,0 +1,76 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    <Button android:id="@+id/scan_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="@string/scan" />
+    <TextView
+    android:id="@+id/scan_format"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textIsSelectable="true"
+    android:layout_centerHorizontal="true"
+    android:layout_below="@id/scan_button" />
+<TextView
+    android:id="@+id/scan_content"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textIsSelectable="true"
+    android:layout_centerHorizontal="true"
+    android:layout_below="@id/scan_format" />
+
+<Button
+    android:id="@+id/scan_key"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/scan_content"
+    android:layout_centerHorizontal="true"
+    android:text="@string/getKey" />
+<TextView
+        android:id="@+id/blank"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textIsSelectable="true"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/scan_key" />
+<Button
+        android:id="@+id/money"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/scan_key"
+        android:layout_centerHorizontal="true"
+        android:text="@string/getMoney" />
+    <Button
+        android:id="@+id/balance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/money"
+        android:layout_centerHorizontal="true"
+        android:text="@string/balance" />
+    <TextView
+        android:id="@+id/balance_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textIsSelectable="true"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/balance" />
+<TextView
+    android:id="@+id/key_text"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textIsSelectable="true"
+    android:layout_centerHorizontal="true"
+    android:layout_below="@id/balance_text" />
+
+<TextView
+    android:id="@+id/pubKeyTxt"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textIsSelectable="true"
+    android:layout_centerHorizontal="true"
+    android:layout_below="@id/key_text" />
+
+</RelativeLayout><!-- From: file:/Users/evarobert/Documents/EECS588/bitcoin-wallet/TransactionSigner/app/src/main/res/layout/activity_main.xml -->
