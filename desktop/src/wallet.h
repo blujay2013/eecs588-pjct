@@ -207,7 +207,8 @@ public:
     bool LoadCryptedKey(const CPubKey &vchPubKey, const std::vector<unsigned char> &vchCryptedSecret);
     bool AddCScript(const CScript& redeemScript);
     bool LoadCScript(const CScript& redeemScript) { return CCryptoKeyStore::AddCScript(redeemScript); }
-
+    bool Add2FACScript(CScript& redeemScript);
+    bool Get2FACScript(CScript& redeemScriptOut);
     /// Adds a destination data tuple to the store, and saves it to disk
     bool AddDestData(const CTxDestination &dest, const std::string &key, const std::string &value);
     /// Erases a destination data tuple in the store and on disk

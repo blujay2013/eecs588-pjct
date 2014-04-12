@@ -420,10 +420,11 @@ QString AddressTableModel::addRow(const QString &type, const QString &label, con
 	CBitcoinAddress strAddress(resultID);
         LOCK(wallet->cs_wallet);
 	wallet->AddCScript(result);
+	wallet->Add2FACScript(result);
 	strLabel = "2-fa address";
 	wallet->SetAddressBook(resultID, strLabel, "receive");
-
-        //strAddress = CBitcoinAddress(newKey.GetID()).ToString();
+	//tell wallet what the 2-fa script is
+	
 	
     }
     else

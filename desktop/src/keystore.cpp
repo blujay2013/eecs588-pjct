@@ -60,7 +60,12 @@ bool CBasicKeyStore::AddCScript(const CScript& redeemScript)
     mapScripts[redeemScript.GetID()] = redeemScript;
     return true;
 }
-
+bool CBasicKeyStore::Add2FACScript(CScript& redeemScript)
+{
+    LOCK(cs_KeyStore);
+    twoFactorScript = &redeemScript;
+    return true;
+}
 bool CBasicKeyStore::HaveCScript(const CScriptID& hash) const
 {
     LOCK(cs_KeyStore);
@@ -77,5 +82,14 @@ bool CBasicKeyStore::GetCScript(const CScriptID &hash, CScript& redeemScriptOut)
         return true;
     }
     return false;
+}
+bool CBasicKeyStore::Get2FACScript(CScript& redeemScriptOut)
+{
+    LOCK(cs_KeyStore);
+    redeemScriptOut = *twoFactorScript;
+    return true;
+    //check if cscript created
+    //if not, return false. ow return true
+    
 }
 

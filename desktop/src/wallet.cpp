@@ -126,6 +126,17 @@ bool CWallet::AddCScript(const CScript& redeemScript)
         return true;
     return CWalletDB(strWalletFile).WriteCScript(Hash160(redeemScript), redeemScript);
 }
+bool CWallet::Add2FACScript(CScript& redeemScript)
+{
+    if (!CCryptoKeyStore::Add2FACScript(redeemScript))
+        return false;
+    return true;
+}
+bool CWallet::Get2FACScript(CScript& redeemScriptOut)
+{
+    return CCryptoKeyStore::Get2FACScript(redeemScriptOut);
+}
+
 
 bool CWallet::Unlock(const SecureString& strWalletPassphrase)
 {

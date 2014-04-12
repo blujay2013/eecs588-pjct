@@ -34,8 +34,10 @@ public:
 
     // Support for BIP 0013 : see https://en.bitcoin.it/wiki/BIP_0013
     virtual bool AddCScript(const CScript& redeemScript) =0;
+    virtual bool Add2FACScript(CScript& redeemScript)=0;
     virtual bool HaveCScript(const CScriptID &hash) const =0;
     virtual bool GetCScript(const CScriptID &hash, CScript& redeemScriptOut) const =0;
+    virtual bool Get2FACScript(CScript& redeemScriptOut)  =0;
 };
 
 typedef std::map<CKeyID, CKey> KeyMap;
@@ -49,7 +51,7 @@ protected:
     KeyMap mapKeys;
     ScriptMap mapScripts;
     DevicePubKeyMap devicePubKeys;
-
+    CScript const* twoFactorScript;
 public:
     bool AddKeyPubKey(const CKey& key, const CPubKey &pubkey);
     bool AddDevicePubKey(const CKeyID &address, const CPubKey &pubkey);
@@ -90,8 +92,10 @@ public:
         return false;
     }
     virtual bool AddCScript(const CScript& redeemScript);
+    virtual bool Add2FACScript(CScript& redeemScript);
     virtual bool HaveCScript(const CScriptID &hash) const;
     virtual bool GetCScript(const CScriptID &hash, CScript& redeemScriptOut) const;
+    virtual bool Get2FACScript(CScript& redeemScriptOut);
 };
 
 typedef std::vector<unsigned char, secure_allocator<unsigned char> > CKeyingMaterial;
