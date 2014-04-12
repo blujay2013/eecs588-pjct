@@ -1,0 +1,25 @@
+apply plugin: 'android'
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "19.0.3"
+
+    defaultConfig {
+        minSdkVersion 9
+        targetSdkVersion 19
+    }
+
+    buildTypes {
+        release {
+            runProguard false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:+'
+    compile 'com.android.support:appcompat-v7:+'
+    compile files('/Users/evarobert/Documents/EECS588/bitcoin-wallet/TransactionSigner/libraries/bitcoinj-0.11-bundled.jar')
+    compile files('/Users/evarobert/Documents/EECS588/bitcoin-wallet/TransactionSigner/libraries/protobuf-java-2.5.0.jar')
+}
