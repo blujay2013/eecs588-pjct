@@ -51,6 +51,7 @@ public slots:
 
 private:
     Ui::AddressBookPage *ui;
+    AskDevicePublicKey * pubKeyDlg;
     AddressTableModel *model;
     Mode mode;
     Tabs tab;
@@ -59,6 +60,7 @@ private:
     QMenu *contextMenu;
     QAction *deleteAction; // to be able to explicitly disable it
     QString newAddressToSelect;
+    bool mfaButtonClicked;
 
 private slots:
     /** Delete currently selected address entry */
