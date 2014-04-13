@@ -502,6 +502,11 @@ bool WalletModel::getDevicePubKey(const CKeyID &address, CPubKey &vchPubKeyOut) 
 	return wallet->GetDevicePubKey(address, vchPubKeyOut);
 }
 
+bool WalletModel::get2FACScript(CScript& redeemScriptOut) const
+{
+	return wallet->Get2FACScript(redeemScriptOut);
+}
+
 void WalletModel::getWalletAddresses(std::vector<CKeyID> &addresses)
 {
 	/* set< set<CTxDestination>> destinations = wallet->GetAddressGroupings();

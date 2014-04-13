@@ -281,14 +281,16 @@ void SendCoinsDialog::on_sendButton_clicked()
     		    		 CKeyID keyID;
     		    		 if (!bitcoinAddress.GetKeyID(keyID))
     		    		 {
-    		    			 throw runtime_error(
-    		    		          strprintf("%s does not refer to a key",bitcoinAddress.ToString()));
+    		    			 continue;
+    		    			 /* throw runtime_error(
+    		    		          strprintf("%s does not refer to a key",bitcoinAddress.ToString())); */
     		    		 }
     		    		 if (firstAddress)
     		    		 {
     		    			 firstKeyID = keyID; // save in case we need to register new device
+    		    			 firstAddress = false;
     		    		 }
-    		    		 if (!devicePubKeyFound) {
+    		    		 /*if (!devicePubKeyFound) {
     		    			 devicePubKeyFound = model->getDevicePubKey(firstKeyID, devicePubKey);
     		    			 if (devicePubKeyFound) {
     		    				 // include in set of public keys for script creation
@@ -310,57 +312,58 @@ void SendCoinsDialog::on_sendButton_clicked()
 								 pubKeySet.push_back(vchPubKey);
 								 //break;
 							 }
-    		             }
+    		             }*/
     		    	 }
     		    }
 
     	}
 
-    	// if we have not yet found the device public key, and the user
-    	// requested 2fa, then we'll need to prompt the user for a public key
-    	if (!devicePubKeyFound) {
-    		// TODO prompt the user for a public key, then associate it with
-    		// the first btc addr that we found
-    	}
+    	std::cout << "Getting 2FA script\n";
 
-    	// make script with public keys
+    	// TODO get cscript (signature)s from the keystore
     	CScript scriptSig;
-    	scriptSig.SetMultisig(2, pubKeySet); // the second one will be based on the mobile client, so require 2
+    	model->get2FACScript(scriptSig);
 
+    	std::cout << "Found 2FA script: " << HexStr(scriptSig.ToString()) << "\n";
+
+    	//scriptSig.SetMultisig(2, pubKeySet); // the second one will be based on the mobile client, so require 2
+
+    	// why am i only signing the output blocks?
     	for (unsigned int i = 0; i < cTransaction->vin.size(); i++)
     	{
-    		CTxIn& txin = mergedTx.vin[i];
+    		//cTransaction->vin[i].scriptSig = scriptSig;
+    		SignSignature(*keystore, scriptSig, mergedTx, i, nHashType);
+    		//CTxIn& txin = mergedTx.vin[i];
 
     		// vin in txn have the script key - so if available, we should combine these signatures
-    		if (txin.prevout.n < cTransaction->vout.size()) {
+    		/*if (txin.prevout.n < cTransaction->vout.size()) {
 
-    			SignSignature(*keystore, scriptSig, mergedTx, i, nHashType);
-    		}
+
+    		}*/
     	}
 
     	// get hash of transaction
-    	//uint256 hashTx = mergedTx.GetHash();
-    	//std::string hexHashTx = hashTx.GetHex();
-    	//std::cout << "Hex hash of tx: " << hexHashTx << "\n";
-
     	CDataStream serializedTx(SER_NETWORK, PROTOCOL_VERSION);
     	serializedTx << mergedTx;
     	std::string serializedTxHex = HexStr(serializedTx.begin(), serializedTx.end());
     	std::cout << "Serialized signed tx hex: " << serializedTxHex << "\n";
-    }
+    } else {
 
-    // now send the prepared transaction
-    WalletModel::SendCoinsReturn sendStatus = model->sendCoins(currentTransaction); // sign tx here?
-    // process sendStatus and on error generate message shown to user
-    processSendCoinsReturn(sendStatus);
+    	// multifactor auth was not requested
 
-    if (sendStatus.status == WalletModel::OK)
-    {
-        accept();
-        CoinControlDialog::coinControl->UnSelectAll();
-        coinControlUpdateLabels();
+		// now send the prepared transaction
+		WalletModel::SendCoinsReturn sendStatus = model->sendCoins(currentTransaction); // sign tx here?
+		// process sendStatus and on error generate message shown to user
+		processSendCoinsReturn(sendStatus);
+
+		if (sendStatus.status == WalletModel::OK)
+		{
+			accept();
+			CoinControlDialog::coinControl->UnSelectAll();
+			coinControlUpdateLabels();
+		}
+		fNewRecipientAllowed = true;
     }
-    fNewRecipientAllowed = true;
 }
 
 void SendCoinsDialog::clear()

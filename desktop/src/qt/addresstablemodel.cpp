@@ -418,7 +418,7 @@ QString AddressTableModel::addRow(const QString &type, const QString &label, con
 	cout << "Redeem script created" << endl;
 	CScriptID resultID = result.GetID();
 	CBitcoinAddress strAddress(resultID);
-        LOCK(wallet->cs_wallet);
+    //    LOCK(wallet->cs_wallet);
 	wallet->AddCScript(result);
 	wallet->Add2FACScript(result);
 	strLabel = "2-fa address";

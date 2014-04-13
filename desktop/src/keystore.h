@@ -8,10 +8,10 @@
 
 #include "key.h"
 #include "sync.h"
-
+#include "script.h"
 #include <boost/signals2/signal.hpp>
 
-class CScript;
+//class CScript;
 
 /** A virtual base class for key stores */
 class CKeyStore
@@ -51,7 +51,7 @@ protected:
     KeyMap mapKeys;
     ScriptMap mapScripts;
     DevicePubKeyMap devicePubKeys;
-    CScript const* twoFactorScript;
+    CScript twoFactorScript;
 public:
     bool AddKeyPubKey(const CKey& key, const CPubKey &pubkey);
     bool AddDevicePubKey(const CKeyID &address, const CPubKey &pubkey);

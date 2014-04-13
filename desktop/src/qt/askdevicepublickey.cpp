@@ -27,7 +27,7 @@ void AskDevicePublicKey::textChangedSlot(QString text)
 	//cPubKey = cPubKeyBuf;
 	std::cout << "Public key is currently " << pubKey << " (size " << cPubKeyBuf.size() << ")";
 
-	if (cPubKeyBuf.IsValid())
+	if (cPubKeyBuf.IsFullyValid())
 	{
 	    std::cout << "Public key is valid: " << cPubKeyBuf.begin() << "\n";
 	    ui->buttonBox->setVisible(true);//->button(QDialogButtonBox::Ok)->setEnabled(true);

@@ -112,6 +112,13 @@ bool CWalletDB::WriteCScript(const uint160& hash, const CScript& redeemScript)
     return Write(std::make_pair(std::string("cscript"), hash), redeemScript, false);
 }
 
+bool CWalletDB::Write2FAScript(const uint160& hash, const CScript& multisig)
+{
+	nWalletDBUpdated++;
+	// set to false because we do not want to overwrite 2fa script once created
+	return Write(std::make_pair(std::string("mscript"), hash), multisig, false);
+}
+
 bool CWalletDB::WriteBestBlock(const CBlockLocator& locator)
 {
     nWalletDBUpdated++;
@@ -551,6 +558,17 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
                 strErr = "Error reading wallet database: LoadCScript failed";
                 return false;
             }
+        } else if (strType == "mscript")
+        {
+        	uint160 hash;
+        	ssKey >> hash;
+        	CScript mScript;
+        	ssValue >> mScript;
+        	if (!pwallet->Load2FACScript(mScript))
+        	{
+        		 strErr = "Error reading wallet database: LoadMScript failed";
+        		 return false;
+        	}
         }
         else if (strType == "orderposnext")
         {

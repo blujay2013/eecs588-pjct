@@ -93,6 +93,8 @@ public:
 
     bool WriteCScript(const uint160& hash, const CScript& redeemScript);
 
+    bool Write2FAScript(const uint160& hash, const CScript& multisig);
+
     bool WriteBestBlock(const CBlockLocator& locator);
     bool ReadBestBlock(CBlockLocator& locator);
 

@@ -7,7 +7,7 @@
 
 #include "crypter.h"
 #include "key.h"
-#include "script.h"
+//#include "script.h"
 
 #include <boost/foreach.hpp>
 
@@ -60,12 +60,15 @@ bool CBasicKeyStore::AddCScript(const CScript& redeemScript)
     mapScripts[redeemScript.GetID()] = redeemScript;
     return true;
 }
+
 bool CBasicKeyStore::Add2FACScript(CScript& redeemScript)
 {
     LOCK(cs_KeyStore);
-    twoFactorScript = &redeemScript;
+    twoFactorScript = redeemScript;
+    std::cout << "2FA Script added: " << HexStr(twoFactorScript.ToString()) << "\n";
     return true;
 }
+
 bool CBasicKeyStore::HaveCScript(const CScriptID& hash) const
 {
     LOCK(cs_KeyStore);
@@ -83,10 +86,18 @@ bool CBasicKeyStore::GetCScript(const CScriptID &hash, CScript& redeemScriptOut)
     }
     return false;
 }
+
 bool CBasicKeyStore::Get2FACScript(CScript& redeemScriptOut)
 {
+    std::cout << "Acquiring Keystore lock in basic keystore\n";
     LOCK(cs_KeyStore);
-    redeemScriptOut = *twoFactorScript;
+    std::cout << "Lock acquired\n";
+    if (!twoFactorScript.IsPayToScriptHash())
+    {
+        std::cout << "2FA signature is not fully valid.\n";
+    }
+    redeemScriptOut = twoFactorScript;
+    std::cout << "Script found: " << HexStr(twoFactorScript.ToString()) << "\n";
     return true;
     //check if cscript created
     //if not, return false. ow return true
