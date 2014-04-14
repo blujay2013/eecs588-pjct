@@ -199,10 +199,17 @@ void AddressBookPage::on_newMultiSigAddress_clicked()
     if(!model)
         return;
 
-    AskDevicePublicKey * pubKeyDlg= new AskDevicePublicKey(model);
-    pubKeyDlg->show();
-    pubKeyDlg->raise();
-    pubKeyDlg->activateWindow();
+    if (!mfaButtonClicked)
+    {
+		pubKeyDlg= new AskDevicePublicKey(model);
+		pubKeyDlg->show();
+		pubKeyDlg->raise();
+		pubKeyDlg->activateWindow();
+		mfaButtonClicked = true;
+    } else
+    {
+    	mfaButtonClicked = false;
+    }
 }
 
 void AddressBookPage::on_deleteAddress_clicked()

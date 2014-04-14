@@ -119,9 +119,7 @@ void SendCoinsDialog::on_sendButton_clicked()
     QList<SendCoinsRecipient> recipients;
     bool valid = true;
     bool isMultisig = (ui->multifactorAuthCheckbox->checkState() == Qt::Checked);
-    //string privKey = ui->privKeyEntryBox->displayText().toStdString();
-    //const unsigned char *primPrivKey = new unsigned char[privKey.length()+1];
-    //primPrivKey = (unsigned char*)privKey.c_str();
+
     int nHashType = SIGHASH_ALL;
 
     for(int i = 0; i < ui->entries->count(); ++i)
@@ -276,7 +274,6 @@ void SendCoinsDialog::on_sendButton_clicked()
     	// check if any of the addresses is associated with a device public key
     	// otherwise, we need to prompt user for a device public key since 2FA
     	// was requested
-    	bool devicePubKeyFound = false;
     	CPubKey devicePubKey;
     	BOOST_FOREACH(set<CTxDestination> grouping, model->GetAddressGroupings())
     	{
