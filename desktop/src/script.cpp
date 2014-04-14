@@ -1601,22 +1601,37 @@ bool VerifyScript(const CScript& scriptSig, const CScript& scriptPubKey, const C
 {
     vector<vector<unsigned char> > stack, stackCopy;
     if (!EvalScript(stack, scriptSig, txTo, nIn, flags, nHashType))
-        return false;
+    {
+        return error("VerifyScript() : could not evaluate scriptSig");
+        //return false;
+    }
     if (flags & SCRIPT_VERIFY_P2SH)
         stackCopy = stack;
     if (!EvalScript(stack, scriptPubKey, txTo, nIn, flags, nHashType))
-        return false;
+    {
+        return error("VerifyScript() : could not evaluate scriptPubKey");
+        //return false;
+    }
     if (stack.empty())
-        return false;
+    {
+        return error("VerifyScript() : stack is empty");
+        //return false;
+    }
 
     if (CastToBool(stack.back()) == false)
-        return false;
+    {
+    	return error("VerifyScript() : back is called on an empty stack");
+    }
+        //return false;
 
     // Additional validation for spend-to-script-hash transactions:
     if ((flags & SCRIPT_VERIFY_P2SH) && scriptPubKey.IsPayToScriptHash())
     {
         if (!scriptSig.IsPushOnly()) // scriptSig must be literals-only
-            return false;            // or validation fails
+        {
+            return error("VerifyScript() : scriptSig contains non-literals");
+            //return false;            // or validation fails
+        }
 
         // stackCopy cannot be empty here, because if it was the
         // P2SH  HASH <> EQUAL  scriptPubKey would be evaluated with
@@ -1628,10 +1643,19 @@ bool VerifyScript(const CScript& scriptSig, const CScript& scriptPubKey, const C
         popstack(stackCopy);
 
         if (!EvalScript(stackCopy, pubKey2, txTo, nIn, flags, nHashType))
-            return false;
+        {
+            return error("VerifyScript() : failed to evaluate script w/ 2nd pub key");//return false;
+        }
         if (stackCopy.empty())
-            return false;
-        return CastToBool(stackCopy.back());
+        {
+        	return error("VerifyScript() : stackCopy is empty");
+            //return false;
+        }
+        if (!CastToBool(stackCopy.back()))
+        {
+        	return error("VerifyScript() : back was called on an empty stackCopy");
+        }
+        //return CastToBool(stackCopy.back());
     }
 
     return true;
