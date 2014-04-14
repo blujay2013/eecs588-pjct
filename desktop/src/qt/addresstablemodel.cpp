@@ -392,7 +392,9 @@ QString AddressTableModel::addRow(const QString &type, const QString &label, con
         // Generate a new address to combine with entered pubkey for multisig
         CPubKey newKey;
 	// Right now we are assuming user will enter public key, so strAddress has the public key actually.
-	CPubKey devicePubKey(ParseHex(strAddress));
+	//CPubKey devicePubKey(ParseHex(strAddress));
+	CPubKey devicePubKey;
+	wallet->GetKeyFromPool(devicePubKey);
         if(!wallet->GetKeyFromPool(newKey))
         {
             WalletModel::UnlockContext ctx(walletModel->requestUnlock());

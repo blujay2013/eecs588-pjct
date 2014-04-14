@@ -18,6 +18,7 @@
 #include "wallet.h"
 #include "walletdb.h" // for BackupWallet
 
+
 #include <stdint.h>
 
 #include <QDebug>
@@ -66,6 +67,36 @@ qint64 WalletModel::getBalance(const CCoinControl *coinControl) const
     return wallet->GetBalance();
 }
 
+bool WalletModel::getUsable2FAOutputs(CBitcoinAddress twoFactorAddress, std::vector<CTxIn>& usableInputs)
+{
+    vector<COutput> vecOutputs;
+    assert(wallet != NULL);
+    wallet->AvailableCoins(vecOutputs, false);
+    CScript redeemScript;
+    wallet->Get2FACScript(redeemScript);
+    //we want to populate usableInputs with usable inputs..
+    BOOST_FOREACH(const COutput& out, vecOutputs)
+    {
+	CTxDestination address;
+	if (!ExtractDestination(out.tx->vout[out.i].scriptPubKey, address))
+	    continue;
+	//Ignore transactions whose outputs are not the twoFactorAddress 
+	if (address.type()!= typeid(CBitcoinAddress)){
+	    continue;
+	}
+	if (!((CBitcoinAddress)address==twoFactorAddress))
+	    continue;
+	int64_t nValue = out.tx->vout[out.i].nValue;
+        const CScript& pk = out.tx->vout[out.i].scriptPubKey;
+	if (!(pk == redeemScript))
+	    std::cout << "transaction redeem script does not match correct redeem script"<<endl;
+        uint256 tx_id =  out.tx->GetHash();
+	COutPoint curCOutPoint(tx_id,out.i);
+	CTxIn curTxIn(tx_id, out.i, redeemScript);
+	usableInputs.push_back(curTxIn);
+    }
+    return true;
+}
 qint64 WalletModel::getUnconfirmedBalance() const
 {
     return wallet->GetUnconfirmedBalance();
