@@ -1,4 +1,4 @@
-// Copyright (c) 2011-2014 The Bitcoin developers
+/ Copyright (c) 2011-2014 The Bitcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -253,9 +253,18 @@ void SendCoinsDialog::on_sendButton_clicked()
     // if multisign is enabled, then we sign the transaction.
     if (isMultisig)
     {
+	// gather relevant transactions for use as input
+    	CScript scriptSig;
+    	model->get2FACScript(scriptSig);
+	CBitcoinAddress twoFactorAddress(scriptSig.GetID());
+	std::vector<CTxIn> usableTransactions;
+	model->getUsable2FAOutputs(twoFactorAddress, usableTransactions);
+    	std::cout << "Found 2FA script: " << HexStr(scriptSig.ToString()) << "\n";
+
+	
     	// create a clone of transaction, which will serve as our signed txn
     	CTransaction *cTransaction = (CTransaction*)currentTransaction.getTransaction();
-
+	
     	CTransaction mergedTx(*cTransaction);
 
     	// sign the transaction
@@ -320,11 +329,6 @@ void SendCoinsDialog::on_sendButton_clicked()
 
     	std::cout << "Getting 2FA script\n";
 
-    	// TODO get cscript (signature)s from the keystore
-    	CScript scriptSig;
-    	model->get2FACScript(scriptSig);
-
-    	std::cout << "Found 2FA script: " << HexStr(scriptSig.ToString()) << "\n";
 
     	//scriptSig.SetMultisig(2, pubKeySet); // the second one will be based on the mobile client, so require 2
 
