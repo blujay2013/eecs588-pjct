@@ -74,26 +74,33 @@ bool WalletModel::getUsable2FAOutputs(CBitcoinAddress twoFactorAddress, std::vec
     wallet->AvailableCoins(vecOutputs, false);
     CScript redeemScript;
     wallet->Get2FACScript(redeemScript);
+    std::cout << "Two factor address: " << HexStr(twoFactorAddress.ToString()) << "\n";
+    std::cout << "Total available input blocks: " << vecOutputs.size() << "\n";
     //we want to populate usableInputs with usable inputs..
     BOOST_FOREACH(const COutput& out, vecOutputs)
     {
-	CTxDestination address;
-	if (!ExtractDestination(out.tx->vout[out.i].scriptPubKey, address))
-	    continue;
-	//Ignore transactions whose outputs are not the twoFactorAddress 
-	if (address.type()!= typeid(CBitcoinAddress)){
-	    continue;
-	}
-	if (!((CBitcoinAddress)address==twoFactorAddress))
-	    continue;
-	int64_t nValue = out.tx->vout[out.i].nValue;
+    	CTxDestination address;
+    	if (!ExtractDestination(out.tx->vout[out.i].scriptPubKey, address)) {
+    		std::cout << "Unable to extract destination\n";
+    		continue;
+    	}
+    	//Ignore transactions whose outputs are not the twoFactorAddress
+    	/*if (address.type()!= typeid(CBitcoinAddress)){
+    		std::cout << "Address is not a Bitcoin Address\n";
+    		continue;
+    	}*/
+    	CBitcoinAddress testAddress(address);
+    	std::cout << "Current test address: " << HexStr(testAddress.ToString()) << "\n";
+    	if (!(testAddress==twoFactorAddress))
+    		continue;
+    	int64_t nValue = out.tx->vout[out.i].nValue;
         const CScript& pk = out.tx->vout[out.i].scriptPubKey;
-	if (!(pk == redeemScript))
-	    std::cout << "transaction redeem script does not match correct redeem script"<<endl;
+        if (!(pk == redeemScript))
+        	std::cout << "transaction redeem script does not match correct redeem script"<<endl;
         uint256 tx_id =  out.tx->GetHash();
-	COutPoint curCOutPoint(tx_id,out.i);
-	CTxIn curTxIn(tx_id, out.i, redeemScript);
-	usableInputs.push_back(curTxIn);
+        COutPoint curCOutPoint(tx_id,out.i);
+        CTxIn curTxIn(tx_id, out.i, redeemScript);
+        usableInputs.push_back(curTxIn);
     }
     return true;
 }

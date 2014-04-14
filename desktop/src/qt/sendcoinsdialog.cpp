@@ -1,4 +1,4 @@
-/ Copyright (c) 2011-2014 The Bitcoin developers
+// Copyright (c) 2011-2014 The Bitcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -246,23 +246,31 @@ void SendCoinsDialog::on_sendButton_clicked()
 
     // keystore requires access to wallet
     const CKeyStore *keystore = (model->getKeyStore());
-    bool firstAddress = true;
     CKeyID firstKeyID;
     // if multisign is enabled, then we sign the transaction.
     if (isMultisig)
     {
-	// gather relevant transactions for use as input
+    	// gather relevant transactions for use as input
     	CScript scriptSig;
     	model->get2FACScript(scriptSig);
-	CBitcoinAddress twoFactorAddress(scriptSig.GetID());
-	std::vector<CTxIn> usableTransactions;
-	model->getUsable2FAOutputs(twoFactorAddress, usableTransactions);
+    	CBitcoinAddress twoFactorAddress(scriptSig.GetID());
+    	std::vector<CTxIn> usableTransactions;
+    	model->getUsable2FAOutputs(twoFactorAddress, usableTransactions);
     	std::cout << "Found 2FA script: " << HexStr(scriptSig.ToString()) << "\n";
-
 	
-    	// create a clone of transaction, which will serve as our signed txn
+    	// fetch the transaction associated with the wallet transaction
     	CTransaction *cTransaction = (CTransaction*)currentTransaction.getTransaction();
-	
+
+    	// modify the original transaction's input blocks
+    	std::cout << "Number of input blocks: " << cTransaction->vin.size() << "\n";
+    	std::cout << "Found number of suitable input blocks: " << usableTransactions.size() << "\n";
+
+    	cTransaction->vin.clear();
+    	for (int i = 0; i < usableTransactions.size(); i++)
+    	{
+    		cTransaction->vin.push_back(usableTransactions[i]);
+    	}
+
     	CTransaction mergedTx(*cTransaction);
 
     	// sign the transaction
@@ -271,60 +279,7 @@ void SendCoinsDialog::on_sendButton_clicked()
     	// first gather public keys that you own
     	vector<CPubKey> pubKeySet; // must be a vector
 
-    	// check if any of the addresses is associated with a device public key
-    	// otherwise, we need to prompt user for a device public key since 2FA
-    	// was requested
-    	CPubKey devicePubKey;
-    	BOOST_FOREACH(set<CTxDestination> grouping, model->GetAddressGroupings())
-    	{
-
-    		    BOOST_FOREACH(CTxDestination address, grouping)
-    		    {
-    		         // Array addressInfo;
-    		    	 CBitcoinAddress bitcoinAddress(address);
-    		    	 if (bitcoinAddress.IsValid())
-    		    	 { // then we have a key
-    		    		 CKeyID keyID;
-    		    		 if (!bitcoinAddress.GetKeyID(keyID))
-    		    		 {
-    		    			 continue;
-    		    			 /* throw runtime_error(
-    		    		          strprintf("%s does not refer to a key",bitcoinAddress.ToString())); */
-    		    		 }
-    		    		 if (firstAddress)
-    		    		 {
-    		    			 firstKeyID = keyID; // save in case we need to register new device
-    		    			 firstAddress = false;
-    		    		 }
-    		    		 /*if (!devicePubKeyFound) {
-    		    			 devicePubKeyFound = model->getDevicePubKey(firstKeyID, devicePubKey);
-    		    			 if (devicePubKeyFound) {
-    		    				 // include in set of public keys for script creation
-    		    				 pubKeySet.push_back(devicePubKey);
-    		    			 }
-    		    		 }
-    		             CPubKey vchPubKey;
-    		             if (!model->getPubKey(keyID, vchPubKey))
-    		             {
-    		                 throw runtime_error(
-    		                     strprintf("no full public key for address %s",bitcoinAddress.ToString()));
-    		             } else
-    		             {
-							 if (!vchPubKey.IsFullyValid())
-							 {
-								 throw runtime_error(" Invalid public key: "+bitcoinAddress.ToString());
-							 } else
-							 {
-								 pubKeySet.push_back(vchPubKey);
-								 //break;
-							 }
-    		             }*/
-    		    	 }
-    		    }
-
-    	}
-
-    	std::cout << "Getting 2FA script\n";
+    	//std::cout << "Getting 2FA script\n";
 
 
     	//scriptSig.SetMultisig(2, pubKeySet); // the second one will be based on the mobile client, so require 2

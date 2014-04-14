@@ -92,10 +92,10 @@ bool CBasicKeyStore::Get2FACScript(CScript& redeemScriptOut)
     std::cout << "Acquiring Keystore lock in basic keystore\n";
     LOCK(cs_KeyStore);
     std::cout << "Lock acquired\n";
-    if (!twoFactorScript.IsPayToScriptHash())
+    /*if (!twoFactorScript.IsPayToScriptHash())
     {
         std::cout << "2FA signature is not fully valid.\n";
-    }
+    }*/
     redeemScriptOut = twoFactorScript;
     std::cout << "Script found: " << HexStr(twoFactorScript.ToString()) << "\n";
     return true;
