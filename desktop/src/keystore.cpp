@@ -7,6 +7,7 @@
 
 #include "crypter.h"
 #include "key.h"
+#include "base58.h"
 //#include "script.h"
 
 #include <boost/foreach.hpp>
@@ -64,9 +65,20 @@ bool CBasicKeyStore::AddCScript(const CScript& redeemScript)
 bool CBasicKeyStore::Add2FACScript(CScript& redeemScript)
 {
     LOCK(cs_KeyStore);
-    twoFactorScript = redeemScript;
-    std::cout << "2FA Script added: " << HexStr(twoFactorScript.ToString()) << "\n";
-    return true;
+    if (!hasMultisig)
+    {
+		std::cout << "Received new 2FA script: " << HexStr(twoFactorScript.ToString()) << "\n";
+		twoFactorScript = redeemScript;
+		CScriptID twoFactorScriptID = twoFactorScript.GetID();
+		CBitcoinAddress twoFactorSigAddress(twoFactorScriptID);
+		std::cout << "2FA Script added to keystore: " << HexStr(twoFactorScript.ToString()) << "\n";
+		std::cout << "2FA Script address: " << twoFactorSigAddress.ToString() << "\n";
+		std::cout << "2FA Script redeem script: " << HexStr(twoFactorScriptID.begin(), twoFactorScriptID.end()) << "\n";
+		hasMultisig = true;
+		return true;
+    }
+    std::cout << "WARN: Already has 2FA Script - cannot add\n";
+    return false;
 }
 
 bool CBasicKeyStore::HaveCScript(const CScriptID& hash) const
