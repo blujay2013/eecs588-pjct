@@ -388,13 +388,13 @@ QString AddressTableModel::addRow(const QString &type, const QString &label, con
     }
     else if(type == DeviceTwoFactor)
     {
-	cout << "Generating new address to combine with given public key"<< endl;
+    	cout << "Generating new address to combine with given public key"<< endl;
         // Generate a new address to combine with entered pubkey for multisig
         CPubKey newKey;
-	// Right now we are assuming user will enter public key, so strAddress has the public key actually.
-	//CPubKey devicePubKey(ParseHex(strAddress));
-	CPubKey devicePubKey;
-	wallet->GetKeyFromPool(devicePubKey);
+        // Right now we are assuming user will enter public key, so strAddress has the public key actually.
+        CPubKey devicePubKey(ParseHex(strAddress));
+        //CPubKey devicePubKey;
+        //wallet->GetKeyFromPool(devicePubKey);
         if(!wallet->GetKeyFromPool(newKey))
         {
             WalletModel::UnlockContext ctx(walletModel->requestUnlock());
@@ -410,26 +410,28 @@ QString AddressTableModel::addRow(const QString &type, const QString &label, con
                 return QString();
             }
         }
-	//create multi-sig address here instead, using two pubkeys I have now
-	cout << "Creating new multi-sig address/script now" << endl;
-	std::vector<CPubKey> pubkeys;
-	pubkeys.push_back(newKey);
-	pubkeys.push_back(devicePubKey);
-	CScript result;
-	result.SetMultisig(2, pubkeys);
-	if (!result.IsPayToScriptHash())
-	    cout << "result is not p2sh "<<endl;
-	else
-	    cout << "result is definitely p2sh" <<endl;
-	cout << "Redeem script created" << endl;
-	CScriptID resultID = result.GetID();
-	CBitcoinAddress strAddress(resultID);
-    //    LOCK(wallet->cs_wallet);
-	wallet->AddCScript(result);
-	wallet->Add2FACScript(result);
-	strLabel = "2-fa address";
-	wallet->SetAddressBook(resultID, strLabel, "receive");
-	//tell wallet what the 2-fa script is
+        //create multi-sig address here instead, using two pubkeys I have now
+        cout << "Creating new multi-sig address/script now" << endl;
+        std::vector<CPubKey> pubkeys;
+        pubkeys.push_back(newKey);
+        pubkeys.push_back(devicePubKey);
+        CScript result;
+        result.SetMultisig(2, pubkeys);
+        if (!result.IsPayToScriptHash())
+        	cout << "result is not p2sh "<<endl;
+        else
+        	cout << "result is definitely p2sh" <<endl;
+        cout << "Redeem script created: " << HexStr(result.ToString()) << endl;
+        CScriptID resultID = result.GetID();
+        CBitcoinAddress strAddress(resultID);
+        //    LOCK(wallet->cs_wallet);
+        wallet->AddCScript(result);
+        if (wallet->Add2FACScript(result))
+        {
+        	strLabel = "2-fa address";
+        	wallet->SetAddressBook(resultID, strLabel, "receive");
+        }
+        //tell wallet what the 2-fa script is
 	
 	
     }

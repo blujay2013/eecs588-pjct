@@ -52,7 +52,9 @@ protected:
     ScriptMap mapScripts;
     DevicePubKeyMap devicePubKeys;
     CScript twoFactorScript;
+    bool hasMultisig;
 public:
+    CBasicKeyStore() : hasMultisig(false) {}
     bool AddKeyPubKey(const CKey& key, const CPubKey &pubkey);
     bool AddDevicePubKey(const CKeyID &address, const CPubKey &pubkey);
     bool GetDevicePubKey(const CKeyID &address, CPubKey &pubKey);
