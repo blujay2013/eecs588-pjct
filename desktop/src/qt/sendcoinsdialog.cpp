@@ -245,7 +245,7 @@ void SendCoinsDialog::on_sendButton_clicked()
     }
 
     // keystore requires access to wallet
-    const CKeyStore *keystore = (model->getKeyStore());
+    const CKeyStore *keystore = (model->getKeyStore());    
     CKeyID firstKeyID;
     // if multisign is enabled, then we sign the transaction.
     if (isMultisig)
@@ -254,25 +254,35 @@ void SendCoinsDialog::on_sendButton_clicked()
     	CScript scriptSig;
     	model->get2FACScript(scriptSig);
     	CBitcoinAddress twoFactorAddress(scriptSig.GetID());
-    	std::vector<CTxIn> usableTransactions;
-    	model->getUsable2FAOutputs(twoFactorAddress, usableTransactions);
+	std::vector<std::pair<CTxIn,CScript> > usableTransactions;
+	int64_t totalInputAmount = 0;
+    	model->getUsable2FAOutputs(twoFactorAddress, usableTransactions,totalInputAmount);
     	std::cout << "Found 2FA script: " << HexStr(scriptSig.ToString()) << "\n";
-	
     	// fetch the transaction associated with the wallet transaction
     	CTransaction *cTransaction = (CTransaction*)currentTransaction.getTransaction();
 
     	// modify the original transaction's input blocks
     	std::cout << "Number of input blocks: " << cTransaction->vin.size() << "\n";
     	std::cout << "Found number of suitable input blocks: " << usableTransactions.size() << "\n";
-
+	//std::cout << "First usable transaction: " << usableTransactions[0].first.ToString()<< "\n";
     	cTransaction->vin.clear();
-    	for (int i = 0; i < usableTransactions.size(); i++)
-    	{
-    		cTransaction->vin.push_back(usableTransactions[i]);
-    	}
-
+	std::vector<CScript> scriptPubKeys;
+	for(int i=0;i<usableTransactions.size();i++)
+	{
+	    cTransaction->vin.push_back(usableTransactions[i].first);
+	    scriptPubKeys.push_back(usableTransactions[i].second);
+	}
+	// also need to modify first output block, which is change block
+	// (assuming change block is first one)
+	// (also assume there is only one real output
+	
+	cTransaction->vout[0].nValue = totalInputAmount-(int64_t)txFee-(cTransaction->vout[1].nValue);
+	
     	CTransaction mergedTx(*cTransaction);
-
+    	CDataStream intermTx(SER_NETWORK, PROTOCOL_VERSION);
+    	intermTx << mergedTx;
+    	std::string intermTxHex = HexStr(intermTx.begin(), intermTx.end());
+    	std::cout << "Unsigned tx hex: " << intermTxHex << "\n";	
     	// sign the transaction
 
     	// create a multi signature
@@ -287,15 +297,22 @@ void SendCoinsDialog::on_sendButton_clicked()
     	// why am i only signing the output blocks?
     	for (unsigned int i = 0; i < cTransaction->vin.size(); i++)
     	{
-    		//cTransaction->vin[i].scriptSig = scriptSig;
-    		SignSignature(*keystore, scriptSig, mergedTx, i, nHashType);
-    		//CTxIn& txin = mergedTx.vin[i];
-
-    		// vin in txn have the script key - so if available, we should combine these signatures
-    		/*if (txin.prevout.n < cTransaction->vout.size()) {
-
-
-    		}*/
+	    CTxIn& txin = mergedTx.vin[i];
+	    txin.scriptSig.clear();
+	    //cTransaction->vin[i].scriptSig = scriptSig;
+	    SignSignature(*keystore, scriptPubKeys[i], mergedTx, i, nHashType);
+	    //CTxIn& txin = mergedTx.vin[i];
+	    
+	    // vin in txn have the script key - so if available, we should combine these signatures
+	    //txin.scriptSig = CombineSignatures(txin.scriptSig, mergedTx, i, scriptSig, scriptSig);
+	    if (!VerifyScript(scriptSig, txin.scriptSig, mergedTx, i, SCRIPT_VERIFY_P2SH | SCRIPT_VERIFY_STRICTENC, 0))
+	    {
+		std::cout << "WARN - Signed block is not verified after combined signatures\n";
+	    }
+	    /*if (txin.prevout.n < cTransaction->vout.size()) {
+	      
+	      
+	      }*/
     	}
 
     	// get hash of transaction

@@ -67,16 +67,17 @@ qint64 WalletModel::getBalance(const CCoinControl *coinControl) const
     return wallet->GetBalance();
 }
 
-bool WalletModel::getUsable2FAOutputs(CBitcoinAddress twoFactorAddress, std::vector<CTxIn>& usableInputs)
+bool WalletModel::getUsable2FAOutputs(CBitcoinAddress twoFactorAddress, std::vector<std::pair<CTxIn, CScript> > &usableInputs, int64_t &inputTotalAmount)
 {
     vector<COutput> vecOutputs;
     assert(wallet != NULL);
     wallet->AvailableCoins(vecOutputs, false);
     CScript redeemScript;
     wallet->Get2FACScript(redeemScript);
-    std::cout << "Two factor address: " << HexStr(twoFactorAddress.ToString()) << "\n";
+    std::cout << "Two factor address: " << twoFactorAddress.ToString() << "\n";
     std::cout << "Total available input blocks: " << vecOutputs.size() << "\n";
     //we want to populate usableInputs with usable inputs..
+    inputTotalAmount = 0;
     BOOST_FOREACH(const COutput& out, vecOutputs)
     {
     	CTxDestination address;
@@ -94,13 +95,14 @@ bool WalletModel::getUsable2FAOutputs(CBitcoinAddress twoFactorAddress, std::vec
     	if (!(testAddress==twoFactorAddress))
     		continue;
     	int64_t nValue = out.tx->vout[out.i].nValue;
+	inputTotalAmount+= nValue;
         const CScript& pk = out.tx->vout[out.i].scriptPubKey;
         if (!(pk == redeemScript))
         	std::cout << "transaction redeem script does not match correct redeem script"<<endl;
         uint256 tx_id =  out.tx->GetHash();
-        COutPoint curCOutPoint(tx_id,out.i);
-        CTxIn curTxIn(tx_id, out.i, redeemScript);
-        usableInputs.push_back(curTxIn);
+        //COutPoint curCOutPoint(tx_id,out.i);
+        CTxIn curTxIn(tx_id, out.i, pk);
+	usableInputs.push_back(std::pair<CTxIn, CScript>(curTxIn,pk));
     }
     return true;
 }

@@ -417,6 +417,10 @@ QString AddressTableModel::addRow(const QString &type, const QString &label, con
 	pubkeys.push_back(devicePubKey);
 	CScript result;
 	result.SetMultisig(2, pubkeys);
+	if (!result.IsPayToScriptHash())
+	    cout << "result is not p2sh "<<endl;
+	else
+	    cout << "result is definitely p2sh" <<endl;
 	cout << "Redeem script created" << endl;
 	CScriptID resultID = result.GetID();
 	CBitcoinAddress strAddress(resultID);
