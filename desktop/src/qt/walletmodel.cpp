@@ -69,15 +69,41 @@ qint64 WalletModel::getBalance(const CCoinControl *coinControl) const
 
 bool WalletModel::getUsable2FAOutputs(CBitcoinAddress twoFactorAddress, std::vector<std::pair<CTxIn, CScript> > &usableInputs, int64_t &inputTotalAmount)
 {
-    vector<COutput> vecOutputs;
+    //vector<COutput> vecOutputs;
     assert(wallet != NULL);
-    wallet->AvailableCoins(vecOutputs, false);
+    //wallet->AvailableCoins(vecOutputs, false);
     CScript redeemScript;
     wallet->Get2FACScript(redeemScript);
     std::cout << "Two factor address: " << twoFactorAddress.ToString() << "\n";
-    std::cout << "Total available input blocks: " << vecOutputs.size() << "\n";
+    //std::cout << "Total available input blocks: " << vecOutputs.size() << "\n";
     //we want to populate usableInputs with usable inputs..
     inputTotalAmount = 0;
+    for (map<uint256, CWalletTx>::iterator it = wallet->mapWallet.begin(); it != wallet->mapWallet.end(); ++it)    
+    {
+	const CWalletTx& wtx = (*it).second;
+
+        if (wtx.IsCoinBase() || !IsFinalTx(wtx))
+            continue;
+
+        int i =0;
+        BOOST_FOREACH(const CTxOut& txout, wtx.vout)
+        {
+            CTxDestination address;
+            if (!ExtractDestination(txout.scriptPubKey, address))
+                continue;
+	    CBitcoinAddress testAddress(address);
+	    if (!(testAddress==twoFactorAddress))
+		continue;
+            int64_t nValue = txout.nValue;
+	    inputTotalAmount+=nValue;
+	    const CScript & pk = txout.scriptPubKey;
+	    uint256 tx_id =  wtx.GetHash();	  
+	    CTxIn curTxIn(tx_id, i, pk);
+	    usableInputs.push_back(std::pair<CTxIn, CScript>(curTxIn,pk));
+	    i++;
+        }
+    }
+/*
     BOOST_FOREACH(const COutput& out, vecOutputs)
     {
     	CTxDestination address;
@@ -85,11 +111,6 @@ bool WalletModel::getUsable2FAOutputs(CBitcoinAddress twoFactorAddress, std::vec
     		std::cout << "Unable to extract destination\n";
     		continue;
     	}
-    	//Ignore transactions whose outputs are not the twoFactorAddress
-    	/*if (address.type()!= typeid(CBitcoinAddress)){
-    		std::cout << "Address is not a Bitcoin Address\n";
-    		continue;
-    	}*/
     	CBitcoinAddress testAddress(address);
     	std::cout << "Current test address: " << HexStr(testAddress.ToString()) << "\n";
     	if (!(testAddress==twoFactorAddress))
@@ -104,6 +125,7 @@ bool WalletModel::getUsable2FAOutputs(CBitcoinAddress twoFactorAddress, std::vec
         CTxIn curTxIn(tx_id, out.i, pk);
 	usableInputs.push_back(std::pair<CTxIn, CScript>(curTxIn,pk));
     }
+*/
     return true;
 }
 qint64 WalletModel::getUnconfirmedBalance() const
