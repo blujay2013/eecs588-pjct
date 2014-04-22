@@ -102,6 +102,7 @@ QT_FORMS_UI = \
   forms/sendcoinsdialog.ui \
   forms/sendcoinsentry.ui \
   forms/signverifymessagedialog.ui \
+  forms/sendmfatransactiondialog.ui \
   forms/transactiondescdialog.ui
 
 QT_MOC_CPP = \
@@ -137,6 +138,7 @@ QT_MOC_CPP = \
   moc_rpcconsole.cpp \
   moc_sendcoinsdialog.cpp \
   moc_sendcoinsentry.cpp \
+  moc_sendmfatransactiondialog.cpp \
   moc_signverifymessagedialog.cpp \
   moc_splashscreen.cpp \
   moc_trafficgraphwidget.cpp \
@@ -202,6 +204,7 @@ BITCOIN_QT_H = \
   rpcconsole.h \
   sendcoinsdialog.h \
   sendcoinsentry.h \
+  sendmfatransactiondialog.h \
   signverifymessagedialog.h \
   splashscreen.h \
   trafficgraphwidget.h \
@@ -302,6 +305,7 @@ BITCOIN_QT_CPP += \
   recentrequeststablemodel.cpp \
   sendcoinsdialog.cpp \
   sendcoinsentry.cpp \
+  sendmfatransactiondialog.cpp \
   transactiondesc.cpp \
   transactiondescdialog.cpp \
   transactionfilterproxy.cpp \

@@ -6,6 +6,7 @@
 #define SENDCOINSDIALOG_H
 
 #include "walletmodel.h"
+#include "sendmfatransactiondialog.h"
 //#include "askprivkeydialog.h"
 
 #include <QDialog>
@@ -55,6 +56,8 @@ private:
     Ui::SendCoinsDialog *ui;
     WalletModel *model;
     bool fNewRecipientAllowed;
+    SendMFATransactionDialog *txnDialog;
+    bool txnDialogDisplayed;
     //AskPrivKeyDialog *privKeyDialog;
 
     // Process WalletModel::SendCoinsReturn and generate a pair consisting

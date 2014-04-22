@@ -113,6 +113,7 @@ SendCoinsDialog::~SendCoinsDialog()
 
 void SendCoinsDialog::on_sendButton_clicked()
 {
+	//txnDialogDisplayed = false;
     if(!model || !model->getOptionsModel())
         return;
 
@@ -323,6 +324,19 @@ void SendCoinsDialog::on_sendButton_clicked()
     	serializedTx << mergedTx;
     	std::string serializedTxHex = HexStr(serializedTx.begin(), serializedTx.end());
     	std::cout << "Serialized signed tx hex: " << serializedTxHex << "\n";
+
+    	if (!txnDialogDisplayed)
+    	{
+    		txnDialog = new SendMFATransactionDialog();
+    		txnDialogDisplayed = true;
+    		txnDialog->show();
+    		txnDialog->raise();
+    		txnDialog->activateWindow();
+    		txnDialog->setQRCode(serializedTxHex);
+    	} else
+    	{
+    		txnDialogDisplayed = false;
+    	}
     } else {
 
     	// multifactor auth was not requested
