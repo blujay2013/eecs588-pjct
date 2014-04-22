@@ -67,7 +67,7 @@ qint64 WalletModel::getBalance(const CCoinControl *coinControl) const
     return wallet->GetBalance();
 }
 
-bool WalletModel::getUsable2FAOutputs(CBitcoinAddress twoFactorAddress, std::vector<std::pair<CTxIn, CScript> > &usableInputs, int64_t &inputTotalAmount)
+bool WalletModel::getUsable2FAOutputs(CBitcoinAddress twoFactorAddress, std::vector<std::pair<CTxIn, CScript> > &usableInputs, int64_t &inputTotalAmount, int64_t sendingAmount)
 {
     //vector<COutput> vecOutputs;
     assert(wallet != NULL);
@@ -86,8 +86,10 @@ bool WalletModel::getUsable2FAOutputs(CBitcoinAddress twoFactorAddress, std::vec
             continue;
 
         int i =0;
-        BOOST_FOREACH(const CTxOut& txout, wtx.vout)
+	//for (vector<CTxOut>::iterator it2 = wtx.vout.begin(); it2 != wtx.vout.end(); ++it2)
+	BOOST_FOREACH(const CTxOut& txout, wtx.vout)
         {
+	    //const CTxOut& = *it2;
             CTxDestination address;
             if (!ExtractDestination(txout.scriptPubKey, address))
                 continue;
@@ -101,31 +103,15 @@ bool WalletModel::getUsable2FAOutputs(CBitcoinAddress twoFactorAddress, std::vec
 	    CTxIn curTxIn(tx_id, i, pk);
 	    usableInputs.push_back(std::pair<CTxIn, CScript>(curTxIn,pk));
 	    i++;
+	    //return early if we've found enough input transactions
+	    std::cout<< "Found "<< inputTotalAmount<<" in "<<i+1<< " blocks."<<endl; 
+	    if (inputTotalAmount>=sendingAmount)
+	    {
+		std::cout << "found enough, we're done here"<<endl;
+		return true;
+	    }
         }
     }
-/*
-    BOOST_FOREACH(const COutput& out, vecOutputs)
-    {
-    	CTxDestination address;
-    	if (!ExtractDestination(out.tx->vout[out.i].scriptPubKey, address)) {
-    		std::cout << "Unable to extract destination\n";
-    		continue;
-    	}
-    	CBitcoinAddress testAddress(address);
-    	std::cout << "Current test address: " << HexStr(testAddress.ToString()) << "\n";
-    	if (!(testAddress==twoFactorAddress))
-    		continue;
-    	int64_t nValue = out.tx->vout[out.i].nValue;
-	inputTotalAmount+= nValue;
-        const CScript& pk = out.tx->vout[out.i].scriptPubKey;
-        if (!(pk == redeemScript))
-        	std::cout << "transaction redeem script does not match correct redeem script"<<endl;
-        uint256 tx_id =  out.tx->GetHash();
-        //COutPoint curCOutPoint(tx_id,out.i);
-        CTxIn curTxIn(tx_id, out.i, pk);
-	usableInputs.push_back(std::pair<CTxIn, CScript>(curTxIn,pk));
-    }
-*/
     return true;
 }
 qint64 WalletModel::getUnconfirmedBalance() const

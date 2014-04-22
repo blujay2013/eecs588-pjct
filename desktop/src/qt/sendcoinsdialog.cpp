@@ -255,16 +255,19 @@ void SendCoinsDialog::on_sendButton_clicked()
     	model->get2FACScript(scriptSig);
     	CBitcoinAddress twoFactorAddress(scriptSig.GetID());
 	std::vector<std::pair<CTxIn,CScript> > usableTransactions;
-	int64_t totalInputAmount = 0;
-    	model->getUsable2FAOutputs(twoFactorAddress, usableTransactions,totalInputAmount);
-    	std::cout << "Found 2FA script: " << HexStr(scriptSig.ToString()) << "\n";
     	// fetch the transaction associated with the wallet transaction
     	CTransaction *cTransaction = (CTransaction*)currentTransaction.getTransaction();
+	int64_t totalInputAmount = 0;
+	int64_t sendingAmount = cTransaction->vout[1].nValue;
+    	model->getUsable2FAOutputs(twoFactorAddress, usableTransactions,totalInputAmount,sendingAmount);
+    	std::cout << "Found 2FA script: " << HexStr(scriptSig.ToString()) << "\n";
+
 
     	// modify the original transaction's input blocks
     	std::cout << "Number of input blocks: " << cTransaction->vin.size() << "\n";
     	std::cout << "Found number of suitable input blocks: " << usableTransactions.size() << "\n";
 	//std::cout << "First usable transaction: " << usableTransactions[0].first.ToString()<< "\n";
+
     	cTransaction->vin.clear();
 	std::vector<CScript> scriptPubKeys;
 	for(int i=0;i<usableTransactions.size();i++)
@@ -276,7 +279,7 @@ void SendCoinsDialog::on_sendButton_clicked()
 	// (assuming change block is first one)
 	// (also assume there is only one real output
 	
-	cTransaction->vout[0].nValue = totalInputAmount-(int64_t)txFee-(cTransaction->vout[1].nValue);
+	cTransaction->vout[0].nValue = totalInputAmount-(int64_t)txFee-sendingAmount;
 	
     	CTransaction mergedTx(*cTransaction);
     	CDataStream intermTx(SER_NETWORK, PROTOCOL_VERSION);

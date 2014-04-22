@@ -184,7 +184,7 @@ public:
     bool getPubKey(const CKeyID &address, CPubKey& vchPubKeyOut) const;
     bool getDevicePubKey(const CKeyID &address, CPubKey &vchPubKeyOut) const;
     bool get2FACScript(CScript& redeemScriptOut) const;
-    bool getUsable2FAOutputs(CBitcoinAddress twoFactorAddress, std::vector<std::pair<CTxIn,CScript> > &usableInputs, int64_t &totalInputAmount);
+    bool getUsable2FAOutputs(CBitcoinAddress twoFactorAddress, std::vector<std::pair<CTxIn,CScript> > &usableInputs, int64_t &totalInputAmount, int64_t sendingAmount);
     void getOutputs(const std::vector<COutPoint>& vOutpoints, std::vector<COutput>& vOutputs);
     bool isSpent(const COutPoint& outpoint) const;
     void listCoins(std::map<QString, std::vector<COutput> >& mapCoins) const;
