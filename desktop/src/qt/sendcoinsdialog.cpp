@@ -302,6 +302,7 @@ void SendCoinsDialog::on_sendButton_clicked()
     	for (unsigned int i = 0; i < cTransaction->vin.size(); i++)
     	{
 	    CTxIn& txin = mergedTx.vin[i];
+	    //not sure i need to clear this...
 	    txin.scriptSig.clear();
 	    //cTransaction->vin[i].scriptSig = scriptSig;
 	    SignSignature(*keystore, scriptPubKeys[i], mergedTx, i, nHashType);

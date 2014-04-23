@@ -80,8 +80,9 @@ bool WalletModel::getUsable2FAOutputs(CBitcoinAddress twoFactorAddress, std::vec
     inputTotalAmount = 0;
     for (map<uint256, CWalletTx>::iterator it = wallet->mapWallet.begin(); it != wallet->mapWallet.end(); ++it)    
     {
+	const uint256& wtxid = it->first;
 	const CWalletTx& wtx = (*it).second;
-
+	
         if (wtx.IsCoinBase() || !IsFinalTx(wtx))
             continue;
 
@@ -90,12 +91,15 @@ bool WalletModel::getUsable2FAOutputs(CBitcoinAddress twoFactorAddress, std::vec
 	BOOST_FOREACH(const CTxOut& txout, wtx.vout)
         {
 	    //const CTxOut& = *it2;
+	    //we don't want spent transactions
+	    if (wallet->IsSpent(wtxid,i))
+		continue;
             CTxDestination address;
             if (!ExtractDestination(txout.scriptPubKey, address))
                 continue;
 	    CBitcoinAddress testAddress(address);
 	    if (!(testAddress==twoFactorAddress))
-		continue;
+		continue;	    
             int64_t nValue = txout.nValue;
 	    inputTotalAmount+=nValue;
 	    const CScript & pk = txout.scriptPubKey;
