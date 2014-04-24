@@ -180,7 +180,6 @@ public:
 
     set<set<CTxDestination> > GetAddressGroupings();
     CKeyStore *getKeyStore();
-    void getWalletAddresses(std::vector<CKeyID> &addresses);
     bool getPubKey(const CKeyID &address, CPubKey& vchPubKeyOut) const;
     bool getDevicePubKey(const CKeyID &address, CPubKey &vchPubKeyOut) const;
     bool get2FACScript(CScript& redeemScriptOut) const;

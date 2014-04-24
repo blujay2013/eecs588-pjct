@@ -22,7 +22,6 @@ class SendMFATransactionDialog : public QDialog
 		void setQRCode(std::string qrCodeStr);
 
 	public slots:
-		//void textChangedSlot(QString text);
 
 	private:
 		Ui::SendMFATransactionDialog *ui;

@@ -69,51 +69,42 @@ qint64 WalletModel::getBalance(const CCoinControl *coinControl) const
 
 bool WalletModel::getUsable2FAOutputs(CBitcoinAddress twoFactorAddress, std::vector<std::pair<CTxIn, CScript> > &usableInputs, int64_t &inputTotalAmount, int64_t sendingAmount)
 {
-    //vector<COutput> vecOutputs;
     assert(wallet != NULL);
-    //wallet->AvailableCoins(vecOutputs, false);
     CScript redeemScript;
     wallet->Get2FACScript(redeemScript);
-    std::cout << "Two factor address: " << twoFactorAddress.ToString() << "\n";
-    //std::cout << "Total available input blocks: " << vecOutputs.size() << "\n";
-    //we want to populate usableInputs with usable inputs..
+
     inputTotalAmount = 0;
     for (map<uint256, CWalletTx>::iterator it = wallet->mapWallet.begin(); it != wallet->mapWallet.end(); ++it)    
     {
-	const uint256& wtxid = it->first;
-	const CWalletTx& wtx = (*it).second;
+    	const uint256& wtxid = it->first;
+    	const CWalletTx& wtx = (*it).second;
 	
-        if (wtx.IsCoinBase() || !IsFinalTx(wtx))
+    	if (wtx.IsCoinBase() || !IsFinalTx(wtx))
             continue;
 
         int i =0;
-	//for (vector<CTxOut>::iterator it2 = wtx.vout.begin(); it2 != wtx.vout.end(); ++it2)
-	BOOST_FOREACH(const CTxOut& txout, wtx.vout)
+        BOOST_FOREACH(const CTxOut& txout, wtx.vout)
         {
-	    //const CTxOut& = *it2;
-	    //we don't want spent transactions
-	    if (wallet->IsSpent(wtxid,i))
-		continue;
-            CTxDestination address;
-            if (!ExtractDestination(txout.scriptPubKey, address))
-                continue;
-	    CBitcoinAddress testAddress(address);
-	    if (!(testAddress==twoFactorAddress))
-		continue;	    
-            int64_t nValue = txout.nValue;
-	    inputTotalAmount+=nValue;
-	    const CScript & pk = txout.scriptPubKey;
-	    uint256 tx_id =  wtx.GetHash();	  
-	    CTxIn curTxIn(tx_id, i, pk);
-	    usableInputs.push_back(std::pair<CTxIn, CScript>(curTxIn,pk));
-	    i++;
-	    //return early if we've found enough input transactions
-	    std::cout<< "Found "<< inputTotalAmount<<" in "<<i+1<< " blocks."<<endl; 
-	    if (inputTotalAmount>=sendingAmount)
-	    {
-		std::cout << "found enough, we're done here"<<endl;
-		return true;
-	    }
+        	//we don't want spent transactions
+        	if (wallet->IsSpent(wtxid,i))
+        		continue;
+        	CTxDestination address;
+        	if (!ExtractDestination(txout.scriptPubKey, address))
+        		continue;
+        	CBitcoinAddress testAddress(address);
+        	if (!(testAddress==twoFactorAddress))
+        		continue;
+        	int64_t nValue = txout.nValue;
+        	inputTotalAmount+=nValue;
+        	const CScript & pk = txout.scriptPubKey;
+        	uint256 tx_id =  wtx.GetHash();
+        	CTxIn curTxIn(tx_id, i, pk);
+        	usableInputs.push_back(std::pair<CTxIn, CScript>(curTxIn,pk));
+        	i++;
+        	if (inputTotalAmount>=sendingAmount)
+        	{
+        		return true;
+        	}
         }
     }
     return true;
@@ -559,23 +550,6 @@ bool WalletModel::get2FACScript(CScript& redeemScriptOut) const
 	return wallet->Get2FACScript(redeemScriptOut);
 }
 
-void WalletModel::getWalletAddresses(std::vector<CKeyID> &addresses)
-{
-	/* set< set<CTxDestination>> destinations = wallet->GetAddressGroupings();
-	BOOST_FOREACH(set<CTxDestination> grouping, pwalletMain->GetAddressGroupings())
-	{
-		BOOST_FOREACH(CTxDestination address, grouping)
-		{
-			CKeyID cAddr;
-			bool success = CBitcoinAddress(address).GetKeyID(cAddr);
-			if (success)
-			{
-				addresses.push_back(cAddr);
-			}
-		}
-	}*/
-}
-
 // returns a list of COutputs from COutPoints
 void WalletModel::getOutputs(const std::vector<COutPoint>& vOutpoints, std::vector<COutput>& vOutputs)
 {
@@ -602,7 +576,7 @@ void WalletModel::listCoins(std::map<QString, std::vector<COutput> >& mapCoins) 
     std::vector<COutput> vCoins;
     wallet->AvailableCoins(vCoins);
 
-    LOCK(wallet->cs_wallet); // ListLockedCoins, mapWallet
+    LOCK(wallet->cs_wallet);
     std::vector<COutPoint> vLockedCoins;
     wallet->ListLockedCoins(vLockedCoins);
 
@@ -671,7 +645,7 @@ bool WalletModel::saveReceiveRequest(const std::string &sAddress, const int64_t 
 
     std::stringstream ss;
     ss << nId;
-    std::string key = "rr" + ss.str(); // "rr" prefix = "receive request" in destdata
+    std::string key = "rr" + ss.str();
 
     LOCK(wallet->cs_wallet);
     if (sRequest.empty())

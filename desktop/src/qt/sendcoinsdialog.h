@@ -7,7 +7,6 @@
 
 #include "walletmodel.h"
 #include "sendmfatransactiondialog.h"
-//#include "askprivkeydialog.h"
 
 #include <QDialog>
 #include <QString>
@@ -58,7 +57,6 @@ private:
     bool fNewRecipientAllowed;
     SendMFATransactionDialog *txnDialog;
     bool txnDialogDisplayed;
-    //AskPrivKeyDialog *privKeyDialog;
 
     // Process WalletModel::SendCoinsReturn and generate a pair consisting
     // of a message and message flags for use in emit message().
