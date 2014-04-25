@@ -14,6 +14,7 @@
 #include "walletmodel.h"
 
 #include "base58.h"
+#include "main.h"
 #include "coincontrol.h"
 #include "ui_interface.h"
 
@@ -260,13 +261,8 @@ void SendCoinsDialog::on_sendButton_clicked()
     	int64_t totalInputAmount = 0;
     	int64_t sendingAmount = cTransaction->vout[1].nValue;
     	model->getUsable2FAOutputs(twoFactorAddress, usableTransactions,totalInputAmount,sendingAmount);
-    	std::cout << "Found 2FA script: " << HexStr(scriptSig.ToString()) << "\n";
-
 
     	// modify the original transaction's input blocks
-    	std::cout << "Number of input blocks: " << cTransaction->vin.size() << "\n";
-    	std::cout << "Found number of suitable input blocks: " << usableTransactions.size() << "\n";
-
     	cTransaction->vin.clear();
 		std::vector<CScript> scriptPubKeys;
 		for(int i=0;i<usableTransactions.size();i++)
@@ -292,9 +288,11 @@ void SendCoinsDialog::on_sendButton_clicked()
     	vector<CPubKey> pubKeySet;
 
     	// why am i only signing the output blocks?
+    	vector<CTransaction> inputBlocks;
     	for (unsigned int i = 0; i < cTransaction->vin.size(); i++)
     	{
 			CTxIn& txin = mergedTx.vin[i];
+			uint256 txHash = txin.prevout.hash;
 			txin.scriptSig.clear();
 			SignSignature(*keystore, scriptPubKeys[i], mergedTx, i, nHashType);
 
@@ -304,6 +302,17 @@ void SendCoinsDialog::on_sendButton_clicked()
 				std::cout << "WARN - Signed block is not verified after combined signatures\n";
 			}
 
+			// gather the transaction for the input blocks
+			uint256 hashBlock = 0;
+			CTransaction inTx;
+			if (!GetTransaction(txHash, inTx, hashBlock, true))
+			{
+				std::cout << "Cannot find transaction " << txHash.GetHex() << " \n";
+			} else
+			{
+				std::cout << "Found input funding transaction \n";
+				inputBlocks.push_back(inTx);
+			}
     	}
 
     	// get hash of transaction
@@ -312,8 +321,18 @@ void SendCoinsDialog::on_sendButton_clicked()
     	std::string serializedTxHex = HexStr(serializedTx.begin(), serializedTx.end());
     	std::cout << "Serialized signed tx hex: " << serializedTxHex << "\n";
 
+    	for (CTransaction inputTx : inputBlocks)
+    	{
+    		CDataStream serializedInputTx(SER_NETWORK, PROTOCOL_VERSION);
+    		serializedInputTx << inputTx;
+    		std::string serializedInputTxHex = HexStr(serializedInputTx.begin(), serializedInputTx.end());
+    		std::cout << "Serialized input tx hex: " << serializedInputTxHex << "\n";
+    	}
+
     	CScriptID twoFactorScriptID = scriptSig.GetID();
-    	std::string redeemScriptStr = HexStr(twoFactorScriptID.begin(), twoFactorScriptID.end());
+    	std::string redeemScriptStr = HexStr(scriptSig.begin(), scriptSig.end());
+
+    	std::cout << "redeem script: " << redeemScriptStr << "\n";
 
     	if (!txnDialogDisplayed)
     	{

@@ -101,18 +101,8 @@ bool CBasicKeyStore::GetCScript(const CScriptID &hash, CScript& redeemScriptOut)
 
 bool CBasicKeyStore::Get2FACScript(CScript& redeemScriptOut)
 {
-    std::cout << "Acquiring Keystore lock in basic keystore\n";
     LOCK(cs_KeyStore);
-    std::cout << "Lock acquired\n";
-    /*if (!twoFactorScript.IsPayToScriptHash())
-    {
-        std::cout << "2FA signature is not fully valid.\n";
-    }*/
     redeemScriptOut = twoFactorScript;
-    std::cout << "Script found: " << HexStr(twoFactorScript.ToString()) << "\n";
     return true;
-    //check if cscript created
-    //if not, return false. ow return true
-    
 }
 
