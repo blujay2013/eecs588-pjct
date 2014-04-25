@@ -1,111 +1,52 @@
+/*
+ * Copyright 2012-2014 the original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.example.transactionsigner;
 
+import java.util.List;
+
+import javax.annotation.CheckForNull;
+
+import com.google.bitcoin.core.Peer;
+import com.google.bitcoin.core.StoredBlock;
+
 /**
- * Created by evarobert on 4/9/14.
+ * @author Andreas Schildbach
  */
+public interface SendCoins
+{
+    public static final String ACTION_PEER_STATE = BlockchainService.class.getPackage().getName() + ".peer_state";
+    public static final String ACTION_PEER_STATE_NUM_PEERS = "num_peers";
 
-import java.io.File;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.concurrent.Executor;
+    public static final String ACTION_BLOCKCHAIN_STATE = BlockchainService.class.getPackage().getName() + ".blockchain_state";
+    public static final String ACTION_BLOCKCHAIN_STATE_BEST_CHAIN_DATE = "best_chain_date";
+    public static final String ACTION_BLOCKCHAIN_STATE_BEST_CHAIN_HEIGHT = "best_chain_height";
+    public static final String ACTION_BLOCKCHAIN_STATE_REPLAYING = "replaying";
+    public static final String ACTION_BLOCKCHAIN_STATE_DOWNLOAD = "download";
+    public static final int ACTION_BLOCKCHAIN_STATE_DOWNLOAD_OK = 0;
+    public static final int ACTION_BLOCKCHAIN_STATE_DOWNLOAD_STORAGE_PROBLEM = 1;
+    public static final int ACTION_BLOCKCHAIN_STATE_DOWNLOAD_NETWORK_PROBLEM = 2;
 
-import com.google.bitcoin.core.*;
-import com.google.bitcoin.kits.WalletAppKit;
-import com.google.bitcoin.store.BlockStore;
-import com.google.bitcoin.store.BlockStoreException;
-import com.google.bitcoin.store.MemoryBlockStore;
+    public static final String ACTION_CANCEL_COINS_RECEIVED = BlockchainService.class.getPackage().getName() + ".cancel_coins_received";
+    public static final String ACTION_RESET_BLOCKCHAIN = BlockchainService.class.getPackage().getName() + ".reset_blockchain";
+    public static final String ACTION_BROADCAST_TRANSACTION = BlockchainService.class.getPackage().getName() + ".broadcast_transaction";
+    public static final String ACTION_BROADCAST_TRANSACTION_HASH = "hash";
 
-public class SendCoins {
-    String network = "test";
-    String recipient = "mvBa1p4an5iJohPE2LPHDyvjrhHHdXs1GZ"; // TODO MAKE THIS CONFIGURABLE
+    @CheckForNull
+    List<Peer> getConnectedPeers();
 
-    final NetworkParameters netParams;
-    BlockStore blockStore;
-    BlockChain chain;
-    Wallet wallet;
-
-    SendCoins(Wallet wallet) {
-        if (network.equalsIgnoreCase("prod")) {
-            netParams = NetworkParameters.prodNet();
-        } else {
-            netParams = NetworkParameters.testNet();
-        }
-
-        blockStore = new MemoryBlockStore(netParams);
-        this.wallet = wallet;
-        try {
-            chain = new BlockChain(netParams, wallet, blockStore);
-            PeerGroup pg = new PeerGroup(netParams, chain);
-            pg.addWallet(wallet);
-            pg.stopAndWait();
-        } catch (BlockStoreException e) {
-            e.printStackTrace();
-        }
-    }
-
-    void sendCoins(String amountToSend) throws InsufficientMoneyException {
-        final BigInteger btcToSend = new BigInteger(amountToSend);
-        final WalletAppKit wak = new WalletAppKit(netParams, new File(Constants.WALLET_FILENAME_PROTOBUF), "") {
-            //@Override
-            protected void OnSetupCompleted() {
-                Address recipientAddress = null;
-                try {
-                    recipientAddress = new Address(netParams, recipient);
-                    final Wallet.SendResult sendResult = this.wallet().sendCoins(this.peerGroup(), recipientAddress, btcToSend);
-                    System.out.println("Sending ...");
-// Register a callback that is invoked when the transaction has propagated across the network.
-// This shows a second style of registering ListenableFuture callbacks, it works when you don't
-// need access to the object the future returns.
-                    sendResult.broadcastComplete.addListener(new Runnable() {
-                                                                 @Override
-                                                                 public void run() {
-                                                                     // The wallet has changed now, it'll get auto saved shortly or when the app shuts down.
-                                                                     System.out.println("Sent coins onwards! Transaction hash is " + sendResult.tx.getHashAsString());
-                                                                 }
-                                                             }, new Executor() {
-
-                                                                 @Override
-                                                                 public void execute(Runnable runnable) {
-                                                                     // do nothing?
-                                                                 }
-                                                             });
-                } catch (AddressFormatException e) {
-                    e.printStackTrace();
-                } catch (InsufficientMoneyException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        wak.stopAndWait();
-
-        /*try {
-            chain = new BlockChain(netParams, wallet, blockStore);
-            PeerGroup pg = new PeerGroup(netParams, chain);
-            pg.addWallet(wallet);
-            pg.stopAndWait();
-            Address recipientAddress = new Address(netParams, recipient);
-            Wallet.SendResult sendTxn = wallet.sendCoins(pg, recipientAddress, btcToSend);
-
-            if (sendTxn == null) {
-                // Failure
-            } else {
-                // success
-                System.out.println("Success!!!!!!!!!");
-            }
-        } catch(BlockStoreException e) {
-            System.out.println(e);
-        } catch (AddressFormatException e) {
-            System.out.println(e);
-        } catch (InsufficientMoneyException e) {
-            System.out.println(e);
-        }
-        */
-    }
-
-    void getBalance() {
-        System.out.println("Current wallet balance: " + wallet.getBalance());
-    }
-
+    List<StoredBlock> getRecentBlocks(int maxBlocks);
 }

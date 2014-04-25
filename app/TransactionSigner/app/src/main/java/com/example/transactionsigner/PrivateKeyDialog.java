@@ -1,5 +1,6 @@
 package com.example.transactionsigner;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -13,6 +14,7 @@ import com.google.bitcoin.core.Wallet;
 /**
  * Created by evarobert on 4/2/14.
  */
+@SuppressLint("NewApi")
 public class PrivateKeyDialog extends DialogFragment {
     private Wallet wallet;
 
@@ -38,7 +40,12 @@ public class PrivateKeyDialog extends DialogFragment {
         } else {
             netParams = NetworkParameters.testNet();
         }
-        builder.setMessage("Address: " + wallet.getKeys().get(0).toAddress(netParams));
+        builder.setMessage("Address: " + wallet.getKeys().get(4).toAddress(netParams))
+               .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                   public void onClick(DialogInterface dialog, int id) {
+                       // do nothing :D
+                   }
+               });
         return builder.create();
     }
 }

@@ -1,9 +1,7 @@
 package com.example.transactionsigner;
 
 import android.annotation.SuppressLint;
-import android.app.FragmentManager;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,40 +9,45 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Build;
 
 import com.google.bitcoin.core.InsufficientMoneyException;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-import android.os.Bundle;
-import android.app.Activity;
+
 import android.content.Intent;
-import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.bitcoin.core.Wallet;
 
+import java.util.Calendar;
+import java.util.Date;
+
 public class MainActivity extends AbstractWalletActivity implements OnClickListener {
 
-	private Button scanBtn,getKeyBtn, getPrivKeyBtn, sendSomeMoney, getBalance;
+	private Button scanBtn,getKeyBtn, getPrivKeyBtn, sendSomeMoney, getBalance, signButton;
 	private TextView formatTxt, contentTxt,addressText,pubKeyText, balanceText;
 
     private PrivateKeyDialog privateKeyDialog;
-	
+	private SignKeyDialog signKeyDialog;
+
 	private WalletApp app;
 	private Wallet wallet;
 
-    private SendCoins sendCoins;
+    private SendCoinsImpl sendCoinsImpl;
+
+    private ProgressBar progress;
+    private long progressStatus = 0;
+    private Handler handler = new Handler();
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        
         app = getWalletApp();
         wallet = app.getWallet();
         
@@ -59,18 +62,46 @@ public class MainActivity extends AbstractWalletActivity implements OnClickListe
         pubKeyText = (TextView)findViewById(R.id.pubKeyTxt);
         getKeyBtn.setOnClickListener(this);
 
+        //sendSomeMoney = (Button)findViewById(R.id.money);
+        //sendSomeMoney.setOnClickListener(this);
+
+        //getBalance = (Button) findViewById(R.id.balance);
+        //getBalance.setOnClickListener(this);
+
+        //balanceText = (TextView)findViewById(R.id.balance_text);
+
+        sendCoinsImpl = new SendCoinsImpl(wallet, this, app);
+
         privateKeyDialog = new PrivateKeyDialog(app.getWallet());
+        signKeyDialog = new SignKeyDialog(app.getWallet(), sendCoinsImpl);
 
-        sendSomeMoney = (Button)findViewById(R.id.money);
-        sendSomeMoney.setOnClickListener(this);
-
-        getBalance = (Button) findViewById(R.id.balance);
-        getBalance.setOnClickListener(this);
-
-        balanceText = (TextView)findViewById(R.id.balance_text);
-
-        sendCoins = new SendCoins(wallet);
-
+        final long startingTime = sendCoinsImpl.getStatus();
+        if (savedInstanceState != null) {
+            progressStatus = savedInstanceState.getInt("progressStatus", (int) startingTime);
+        }
+        //progress = (ProgressBar) findViewById(R.id.progress_bar);
+        //Calendar c = Calendar.getInstance();
+        //System.out.println("*****" + startingTime + "    " + c.get(Calendar.SECOND));
+        //progress.setMax((int) new Date().getTime());
+        /*
+        new Thread(new Runnable() {
+            public void run() {
+                while (progressStatus < progress.getMax()) {
+                    progressStatus = sendCoinsImpl.getStatus();
+                    //System.out.println("progressStatus: " + progressStatus + ", startingTime: " + startingTime);
+                    //Update progress bar
+                    handler.post(new Runnable() {
+                        public void run() {
+                            progress.setProgress((int) progressStatus - (int) startingTime);
+                            //setContentView(R.layout.activity_main);
+                        }
+                    });
+                }
+            }
+        }).start();
+        */
+        signButton = (Button) findViewById(R.id.sign_button);
+        signButton.setOnClickListener(this);
     }
     
 	@Override
@@ -78,7 +109,7 @@ public class MainActivity extends AbstractWalletActivity implements OnClickListe
 	{
 		super.onResume();
 
-		//getWalletApplication().startBlockchainService(true);
+		getWalletApp().startBlockchainService(true);
 
 		//checkLowStorageAlert();
 	}
@@ -93,21 +124,18 @@ public class MainActivity extends AbstractWalletActivity implements OnClickListe
     	}
     	if(v.getId()==R.id.scan_key){
     		//Create a public/private key pair
-    		app.addNewKeyToWallet();
+    		//app.addNewKeyToWallet();
+            System.out.println("Num keys: " + app.getWallet().getKeys().size());
+            sendCoinsImpl.addKeyToWallet(app.getWallet().getKeys().get(4));
     		//addressText.setText("ADDRESS: " + app.getAddressOf(0));
-            pubKeyText.setText("TEST" + app.getWallet().getKeys().get(0).toStringWithPrivate());
+            //sendCoinsImpl.getWallet().getKeys().get(4).getPrivateKeyEncoded(netParams);
+            pubKeyText.setText("TEST" + sendCoinsImpl.getWallet().getKeys().get(4).toString());
     		//pubKeyText.setText("PUBLIC KEY: " + app.getWallet());//TODO: Just print pub key here
             privateKeyDialog.show(getFragmentManager(), "privatekeydialog");
     	}
-        if (v.getId() == R.id.money) {
-            try {
-                sendCoins.sendCoins("100000");
-            } catch (InsufficientMoneyException e) {
-                e.printStackTrace();
-            }
-        }
-        if (v.getId() == R.id.balance) {
-            balanceText.setText("Current wallet balance: " + wallet.getBalance());
+        if (v.getId() == R.id.sign_button) {
+            // Popup input dialog to enter in partially signed transaction
+            signKeyDialog.show(getFragmentManager(), "signkeydialog");
         }
     }
     
@@ -120,6 +148,13 @@ public class MainActivity extends AbstractWalletActivity implements OnClickListe
     		String scanFormat = scanningResult.getFormatName();
     		formatTxt.setText("FORMAT: " + scanFormat);
     		contentTxt.setText("CONTENT: " + scanContent);
+            String delims = ":";
+            String[] tokens = scanContent.split(delims);
+            System.out.println("Here's the transaction: " + tokens[0]);
+            System.out.println("Here's the redeem script: " + tokens[1]);
+            // signed t, redeem,
+            // String transactionBytes, String redeemScript, SendCoinsImpl sendCoinsImpl, NetworkParameters netParams, Wallet wallet) {
+            SignPartialTransaction spt = new SignPartialTransaction(tokens[0], tokens[1], sendCoinsImpl, sendCoinsImpl.netParams, wallet);
     	} else{
     	    Toast toast = Toast.makeText(getApplicationContext(), 
     	            "No scan data received!", Toast.LENGTH_SHORT);

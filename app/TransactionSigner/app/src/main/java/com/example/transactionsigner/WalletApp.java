@@ -77,7 +77,7 @@ public class WalletApp extends Application {
 		config = new Configuration(PreferenceManager.getDefaultSharedPreferences(this));
 		activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
 
-		blockchainServiceIntent = new Intent(this, BlockchainServiceImpl.class);
+		blockchainServiceIntent = new Intent(this, SendCoinsImpl.class);
 		blockchainServiceCancelCoinsReceivedIntent = new Intent(BlockchainService.ACTION_CANCEL_COINS_RECEIVED, null, this,
 				BlockchainServiceImpl.class);
 		blockchainServiceResetBlockchainIntent = new Intent(BlockchainService.ACTION_RESET_BLOCKCHAIN, null, this, BlockchainServiceImpl.class);
@@ -263,9 +263,11 @@ public class WalletApp extends Application {
 	public void addNewKeyToWallet()
 	{
 		try{
-			wallet.addKey(new ECKey());
-			//backupWallet();
+            ECKey newOne = new ECKey();
+			wallet.addKey(newOne);
+			backupWallet();
 			wallet.saveToFile(walletFile);
+            System.out.println("!!! NEW KEY: " + newOne.toStringWithPrivate());
 		} catch (IOException e) {
 			System.out.println("unable to create wallet file.");
 		}
